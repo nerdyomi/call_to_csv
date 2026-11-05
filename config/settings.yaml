@@ -1,0 +1,37 @@
+# Non-secret defaults. Secrets and per-machine overrides go in .env (see .env.example).
+# Relative paths are resolved from the project root.
+
+paths:
+  input_dir: input/recordings
+  manifest: input/manifest.csv      # optional; see README
+  output_dir: output
+  schema: config/schema.yaml
+  pricing: config/pricing.yaml
+  system_prompt: prompts/system_prompt.md
+
+audio:
+  extensions: [.mp3, .mpeg, .mpga, .wav, .m4a, .aac, .ogg, .flac]
+  inline_limit_mb: 18               # larger files go through the Gemini Files API
+
+# Recording file names look like 20261025-114133_IFARMERR__4004_01745196254-all.mp3
+# (date/time part is optional: a bare 01762709049.mp3 still gives the phone number)
+filename:
+  regex: '^(?:(?P<date>\d{8})-(?P<time>\d{6})_.*?_)?(?P<phone>0?1\d{9})(?:-.*)?$'
+  timezone_offset: "+0600"
+  phone_country_prefix: "88"
+
+model:
+  temperature: 0.0
+  thinking_budget: null             # null = model default, 0 = off (where supported), N = token cap
+
+run:
+  workers: 2                        # parallel calls; keep low on the free tier
+  requests_per_minute: 8            # client-side throttle; free tier limits are strict
+  max_retries: 5
+  retry_base_seconds: 4
+
+output:
+  csv_encoding: utf-8-sig           # BOM so Excel shows Bangla correctly; pandas reads it fine
+  main_csv: CEX.csv
+  review_csv: review.csv            # low-confidence values and warnings, one row per issue
+  evidence_csv: evidence.csv        # one row per extracted value with quote + timestamp

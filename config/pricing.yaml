@@ -1,0 +1,34 @@
+# USD per 1M tokens. VERIFY against https://ai.google.dev/gemini-api/pricing before relying on
+# these numbers: they are typed in by hand and Google changes prices and model names.
+# `audio_input` applies to the audio part of the prompt; `text_input` to the system prompt text.
+# Thinking tokens are billed at the `output` rate.
+
+audio_tokens_per_second: 32       # Gemini audio tokenisation (documented: 32 tokens/s)
+
+models:
+  gemini-3.8-flash:               # price until 2026-12-31; rises to 1.50 / 7.50 from 2027-01-01
+    text_input: 0.75
+    audio_input: 0.75             # AUDIO PRICE NOT LISTED on the pricing page: assumed = text. Verify.
+    output: 3.75
+  gemini-3.5-flash-lite:
+    text_input: 0.30
+    audio_input: 0.30
+    output: 2.50
+  gemini-2.5-flash:
+    text_input: 0.30
+    audio_input: 1.00
+    output: 2.50
+  gemini-2.5-flash-lite:
+    text_input: 0.10
+    audio_input: 0.30
+    output: 0.40
+  gemini-2.5-pro:                 # prompts <= 200k tokens
+    text_input: 1.25
+    audio_input: 1.25
+    output: 10.00
+
+# Typical output size per call, used only for the forecast (no API needed).
+# Replace with real numbers from output/usage.jsonl after your first runs.
+assumed_output_tokens_per_call: 6000
+
+usd_to_bdt: 122

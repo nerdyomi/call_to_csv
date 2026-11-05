@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/
+input/recordings/*
+!input/recordings/.gitkeep
+input/manifest.csv
+output/
+
+# real farmer data (NID, phone numbers, call audio): never commit
+reference/
+past_input/
+*.mp3
+*.mpeg

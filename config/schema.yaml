@@ -1,0 +1,871 @@
+version: 1
+closed_enums: false
+fields:
+- name: Call ID
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Started at
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Ended at
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Duration (seconds)
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Direction
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Status
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Customer
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Customer ID
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Phone
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Customer type
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Division
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: District
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Upazila
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Category
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Subcategory
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Disposition
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Stakeholder type
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Portfolio
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Agent
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Campaign
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Transferred
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: First call resolution
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: CSAT
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: Notes
+  source: audio
+  type: text
+  description: Short summary of the call in romanized Bangla (Banglish), same style as the CEX agents write by hand.
+- name: call_form
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: call_form_version
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: loan_id
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: project_sub_type
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: item_name_crops
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: item_name_livestock
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: item_name_vegetable
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: item_name_fish
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: item_name_fruits
+  source: manifest
+  type: text
+  description: Call-system/loan-app value; supplied through manifest.csv, not from the audio.
+- name: current_landsize
+  source: audio
+  type: number
+  description: Total land the farmer cultivates this season, in decimals (shotok).
+- name: previous_year_landsize
+  source: audio
+  type: number
+  description: Total land the farmer cultivated last year, in decimals (shotok).
+- name: invest
+  source: audio
+  type: number
+  description: Total cost the farmer invests in the loan's main crop/project, BDT.
+- name: yield
+  source: audio
+  type: number
+  description: Total production of the loan's main crop/project, in kg. If the farmer speaks in maund (mon), convert at 1
+    maund = 40 kg.
+- name: unit_price
+  source: audio
+  type: number
+  description: Selling price per maund of the loan's main crop, BDT.
+- name: loan_amount
+  source: audio
+  type: number
+  description: Loan amount the farmer wants to take, BDT.
+- name: farmland
+  source: audio
+  type: multi
+  description: Land-holding types the farmer has.
+  known_values:
+  - own
+  - lease_mortgage
+- name: own
+  source: audio
+  type: number
+  description: Land the farmer personally owns, in decimals.
+- name: lease_mortgage
+  source: audio
+  type: number
+  description: Land taken on lease or mortgage, in decimals.
+- name: household_farm_assets
+  source: audio
+  type: multi
+  description: Livestock/poultry kept at home.
+  known_values:
+  - cow
+  - goat
+  - sheep
+  - duck
+  - chicken
+  - horse
+  - other
+- name: number_of_cows
+  source: audio
+  type: number
+  description: Number of cows owned.
+- name: number_of_goats
+  source: audio
+  type: number
+  description: Number of goats owned.
+- name: number_of_sheep
+  source: audio
+  type: number
+  description: Number of sheep owned.
+- name: number_of_ducks
+  source: audio
+  type: number
+  description: Number of ducks owned.
+- name: number_of_chicken
+  source: audio
+  type: number
+  description: Number of chickens owned.
+- name: number_of_horses
+  source: audio
+  type: number
+  description: Number of horses owned.
+- name: other_farm_asset_names
+  source: audio
+  type: text
+  description: Names of other farm animals/assets not listed above.
+- name: number_of_other_farm_assets
+  source: audio
+  type: number
+  description: Count of those other farm assets.
+- name: farmer_assets
+  source: audio
+  type: multi
+  description: Household assets owned.
+  known_values:
+  - tv
+  - fridge
+  - motor_pump
+  - cycle
+  - smartphone
+  - buttonphone
+- name: smart_phone_ownership
+  source: audio
+  type: enum
+  description: Who owns the smartphone.
+  known_values:
+  - self
+  - family
+- name: agri_machineries
+  source: audio
+  type: multi
+  description: Farm machinery the farmer owns or has access to.
+  known_values:
+  - shallow_machine
+  - spray
+- name: cow_purpose
+  source: audio
+  type: text
+  description: Why the farmer keeps cows (e.g. milk, fattening). Only for cow portfolios.
+- name: cow_breed
+  source: audio
+  type: text
+  description: Breed of the cows being reared. Only for cow portfolios.
+- name: type_of_breed_reared
+  source: audio
+  type: text
+  description: Type of breed reared (e.g. local, cross). Only for cow portfolios.
+- name: has_cowshed
+  source: audio
+  type: enum
+  description: Whether the farmer has a cowshed (yes/no).
+  known_values:
+  - 'yes'
+  - 'no'
+- name: cowshed_material
+  source: audio
+  type: text
+  description: Material of the cowshed.
+- name: cowshed_facility
+  source: audio
+  type: text
+  description: Facilities in the cowshed (floor, drainage, light, etc.).
+- name: cowshed_capacity
+  source: audio
+  type: number
+  description: How many cows the shed can hold.
+- name: cow_transactional_data
+  source: audio
+  type: number
+  description: How many cow buy/sell cycles the farmer described (1 or 2).
+- name: if_1_breed
+  source: audio
+  type: text
+  description: Breed of cow/animal in transaction 1.
+- name: if_1_purchase_price
+  source: audio
+  type: number
+  description: Purchase price in transaction 1, BDT (0 if raised at home).
+- name: if_1_duration
+  source: audio
+  type: number
+  description: Rearing duration in transaction 1, months.
+- name: if_1_rearing_cost
+  source: audio
+  type: number
+  description: Rearing cost in transaction 1, BDT.
+- name: if_1_sell
+  source: audio
+  type: number
+  description: Selling price in transaction 1, BDT.
+- name: if_2_breed
+  source: audio
+  type: text
+  description: Breed of cow/animal in transaction 2.
+- name: if_2_purchase_price
+  source: audio
+  type: number
+  description: Purchase price in transaction 2, BDT (0 if raised at home).
+- name: if_2_duration
+  source: audio
+  type: number
+  description: Rearing duration in transaction 2, months.
+- name: if_2_rearing_cost
+  source: audio
+  type: number
+  description: Rearing cost in transaction 2, BDT.
+- name: if_2_sell
+  source: audio
+  type: number
+  description: Selling price in transaction 2, BDT.
+- name: other_farming_activity
+  source: audio
+  type: multi
+  description: Other crops the farmer grows besides the loan crop.
+  known_values:
+  - maize
+  - potato
+  - paddy
+  - onion
+  - chili
+  - mustard
+  - vegetable
+  - others
+- name: maize_land_size
+  source: audio
+  type: number
+  description: Land used for maize, in decimals.
+- name: maize_invest
+  source: audio
+  type: number
+  description: Total cost invested in maize, BDT.
+- name: maize_yield
+  source: audio
+  type: number
+  description: Total maize production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: maize_unit_price
+  source: audio
+  type: number
+  description: Selling price of maize per maund, BDT.
+- name: potato_land_size
+  source: audio
+  type: number
+  description: Land used for potato, in decimals.
+- name: potato_invest
+  source: audio
+  type: number
+  description: Total cost invested in potato, BDT.
+- name: potato_yield
+  source: audio
+  type: number
+  description: Total potato production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: potato_unit_price
+  source: audio
+  type: number
+  description: Selling price of potato per maund, BDT.
+- name: paddy_land_size
+  source: audio
+  type: number
+  description: Land used for paddy, in decimals.
+- name: paddy_invest
+  source: audio
+  type: number
+  description: Total cost invested in paddy, BDT.
+- name: paddy_yield
+  source: audio
+  type: number
+  description: Total paddy production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: paddy_unit_price
+  source: audio
+  type: number
+  description: Selling price of paddy per maund, BDT.
+- name: onion_land_size
+  source: audio
+  type: number
+  description: Land used for onion, in decimals.
+- name: onion_invest
+  source: audio
+  type: number
+  description: Total cost invested in onion, BDT.
+- name: onion_yield
+  source: audio
+  type: number
+  description: Total onion production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: onion_unit_price
+  source: audio
+  type: number
+  description: Selling price of onion per maund, BDT.
+- name: chili_land_size
+  source: audio
+  type: number
+  description: Land used for chili, in decimals.
+- name: chili_invest
+  source: audio
+  type: number
+  description: Total cost invested in chili, BDT.
+- name: chili_yield
+  source: audio
+  type: number
+  description: Total chili production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: chili_unit_price
+  source: audio
+  type: number
+  description: Selling price of chili per maund, BDT.
+- name: mustard_land_size
+  source: audio
+  type: number
+  description: Land used for mustard, in decimals.
+- name: mustard_invest
+  source: audio
+  type: number
+  description: Total cost invested in mustard, BDT.
+- name: mustard_yield
+  source: audio
+  type: number
+  description: Total mustard production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: mustard_unit_price
+  source: audio
+  type: number
+  description: Selling price of mustard per maund, BDT.
+- name: vegetable_name
+  source: audio
+  type: text
+  description: Name(s) of vegetables grown.
+- name: vegetable_land_size
+  source: audio
+  type: number
+  description: Land used for vegetables, in decimals.
+- name: vegetable_invest
+  source: audio
+  type: number
+  description: Total cost invested in vegetables, BDT.
+- name: vegetable_yield
+  source: audio
+  type: number
+  description: Total vegetables production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: vegetable_unit_price
+  source: audio
+  type: number
+  description: Selling price of vegetables per maund, BDT.
+- name: others_farming
+  source: audio
+  type: text
+  description: Name of any other crop grown that is not listed.
+- name: others_land_size
+  source: audio
+  type: number
+  description: Land used for the other crop, in decimals.
+- name: others_invest
+  source: audio
+  type: number
+  description: Total cost invested in the other crop, BDT.
+- name: others_yield
+  source: audio
+  type: number
+  description: Total the other crop production, in kg. If the farmer speaks in maund (mon), convert at 1 maund = 40 kg.
+- name: others_unit_price
+  source: audio
+  type: number
+  description: Selling price of the other crop per maund, BDT.
+- name: other_farming_activities_livestock
+  source: audio
+  type: multi
+  description: Other livestock activities (say 'none' if the farmer has none).
+  known_values:
+  - cow
+  - goat
+  - duck
+  - poultry
+  - fisheries
+  - others
+  - none
+- name: cow_invest
+  source: audio
+  type: number
+  description: Cost invested in cow rearing, BDT.
+- name: cow_sell
+  source: audio
+  type: number
+  description: Sales/income from cow, BDT.
+- name: goat_invest
+  source: audio
+  type: number
+  description: Cost invested in goat rearing, BDT.
+- name: goat_sell
+  source: audio
+  type: number
+  description: Sales/income from goat, BDT.
+- name: duck_invest
+  source: audio
+  type: number
+  description: Cost invested in duck rearing, BDT.
+- name: duck_sell
+  source: audio
+  type: number
+  description: Sales/income from duck, BDT.
+- name: poultry_invest
+  source: audio
+  type: number
+  description: Cost invested in poultry rearing, BDT.
+- name: poultry_sell
+  source: audio
+  type: number
+  description: Sales/income from poultry, BDT.
+- name: fisheries_invest
+  source: audio
+  type: number
+  description: Cost invested in fisheries rearing, BDT.
+- name: fisheries_sell
+  source: audio
+  type: number
+  description: Sales/income from fisheries, BDT.
+- name: others_livestock
+  source: audio
+  type: text
+  description: Name of any other livestock activity not listed.
+- name: others_livestock_invest
+  source: audio
+  type: number
+  description: Cost invested in the other livestock, BDT.
+- name: others_livestock_sell
+  source: audio
+  type: number
+  description: Sales/income from the other livestock, BDT.
+- name: current_loan_count
+  source: audio
+  type: number
+  description: Number of loans the farmer currently has running (0 if none).
+- name: current_loan_amount
+  source: audio
+  type: number
+  description: Amount of the farmer's current loan, BDT.
+- name: current_loan_duration
+  source: audio
+  type: number
+  description: Duration of the farmer's current loan, months.
+- name: installment_type
+  source: audio
+  type: enum
+  description: Installment frequency of the farmer's current loan.
+  known_values: &id001
+  - weekly
+  - monthly
+- name: weekly
+  source: audio
+  type: number
+  description: Weekly installment amount, BDT.
+- name: monthly
+  source: audio
+  type: number
+  description: Monthly installment amount, BDT.
+- name: remaining_month
+  source: audio
+  type: number
+  description: Months remaining on the farmer's current loan.
+- name: loan_reason
+  source: audio
+  type: text
+  description: What the farmer's current loan was taken for (e.g. agriculture, livestock, business).
+- name: loan_access
+  source: audio
+  type: enum
+  description: Source of the farmer's current loan.
+  known_values: &id002
+  - bank
+  - mfi
+- name: loan_access_bank
+  source: audio
+  type: text
+  description: Bank name for the farmer's current loan.
+- name: others_bank_name
+  source: audio
+  type: text
+  description: Bank name if it is not a well-known one.
+- name: loan_access_mfi
+  source: audio
+  type: text
+  description: MFI/NGO name for the farmer's current loan.
+- name: others_mfi_name
+  source: audio
+  type: text
+  description: MFI/NGO name if it is not a well-known one.
+- name: current_spouse_loan_count
+  source: audio
+  type: number
+  description: Number of loans the farmer's spouse currently has running (0 if none).
+- name: current_spouse_loan_amount
+  source: audio
+  type: number
+  description: Amount of the spouse's current loan, BDT.
+- name: current_spouse_loan_duration
+  source: audio
+  type: number
+  description: Duration of the spouse's current loan, months.
+- name: spouse_loan_installment_type
+  source: audio
+  type: enum
+  description: Installment frequency of the spouse's current loan.
+  known_values: *id001
+- name: spouse_loan_weekly
+  source: audio
+  type: number
+  description: Weekly installment amount, BDT.
+- name: spouse_loan_monthly
+  source: audio
+  type: number
+  description: Monthly installment amount, BDT.
+- name: spouse_remaining_month
+  source: audio
+  type: number
+  description: Months remaining on the spouse's current loan.
+- name: spouse_loan_reason
+  source: audio
+  type: text
+  description: What the spouse's current loan was taken for (e.g. agriculture, livestock, business).
+- name: spouse_loan_access
+  source: audio
+  type: enum
+  description: Source of the spouse's current loan.
+  known_values: *id002
+- name: spouse_loan_access_bank
+  source: audio
+  type: text
+  description: Bank name for the spouse's current loan.
+- name: spouse_loan_access_bank_others_name
+  source: audio
+  type: text
+  description: Bank name if it is not a well-known one.
+- name: spouse_loan_access_mfi
+  source: audio
+  type: text
+  description: MFI/NGO name for the spouse's current loan.
+- name: spouse_loan_access_mfi_others_name
+  source: audio
+  type: text
+  description: MFI/NGO name if it is not a well-known one.
+- name: number_of_dependents
+  source: audio
+  type: number
+  description: Number of people dependent on the farmer.
+- name: individual_income_sources
+  source: audio
+  type: multi
+  description: The farmer's own income sources.
+  known_values:
+  - agriculture
+  - business
+  - labor
+  - govt_job
+  - private_job
+  - driving
+  - stipend
+  - others
+- name: income_from_agriculture
+  source: audio
+  type: number
+  description: Farmer's yearly income from agriculture, BDT.
+- name: income_from_business
+  source: audio
+  type: number
+  description: Farmer's yearly income from business, BDT.
+- name: business_type
+  source: audio
+  type: text
+  description: Type of the farmer's business (e.g. shop).
+- name: income_from_labor
+  source: audio
+  type: number
+  description: Farmer's yearly income from labor, BDT.
+- name: labor_job_details
+  source: audio
+  type: text
+  description: Details of the farmer's labor work.
+- name: income_from_govt_job
+  source: audio
+  type: number
+  description: Farmer's yearly income from a government job, BDT.
+- name: govt_job_details
+  source: audio
+  type: text
+  description: Details of the farmer's government job.
+- name: income_from_private_job
+  source: audio
+  type: number
+  description: Farmer's yearly income from a private job, BDT.
+- name: private_job_details
+  source: audio
+  type: text
+  description: Details of the farmer's private job.
+- name: income_from_driving
+  source: audio
+  type: number
+  description: Farmer's yearly income from driving, BDT.
+- name: income_from_stipend
+  source: audio
+  type: number
+  description: Farmer's yearly income from stipend, BDT.
+- name: income_from_others
+  source: audio
+  type: number
+  description: Farmer's yearly income from other sources, BDT.
+- name: family_member_income_sources
+  source: audio
+  type: multi
+  description: Income sources of other family members (say 'none' if nobody else earns).
+  known_values:
+  - agriculture
+  - business
+  - labor
+  - govt_job
+  - private_job
+  - driving
+  - stipend
+  - others
+  - none
+- name: family_member_income_from_agriculture
+  source: audio
+  type: number
+  description: Other family members' yearly income from agriculture, BDT.
+- name: family_member_income_from_business
+  source: audio
+  type: number
+  description: Other family members' yearly income from business, BDT.
+- name: family_member_income_from_labor
+  source: audio
+  type: number
+  description: Other family members' yearly income from labor, BDT.
+- name: family_member_labor_details
+  source: audio
+  type: text
+  description: Details of family members' labor work.
+- name: family_member_income_from_govt_job
+  source: audio
+  type: number
+  description: Other family members' yearly income from a government job, BDT.
+- name: family_member_govt_job_details
+  source: audio
+  type: text
+  description: Details of family members' government jobs.
+- name: family_member_income_from_private_job
+  source: audio
+  type: number
+  description: Other family members' yearly income from a private job, BDT.
+- name: family_member_private_job_details
+  source: audio
+  type: text
+  description: Details of family members' private jobs.
+- name: family_member_income_from_driving
+  source: audio
+  type: number
+  description: Other family members' yearly income from driving, BDT.
+- name: family_member_income_from_stipend
+  source: audio
+  type: number
+  description: Other family members' yearly income from stipend, BDT.
+- name: support_amount_from_family
+  source: audio
+  type: number
+  description: Yearly financial support received from family members living elsewhere, BDT.
+- name: family_member_income_from_others
+  source: audio
+  type: number
+  description: Other family members' yearly income from other sources, BDT.
+- name: monthly_expenses
+  source: audio
+  type: number
+  description: Household monthly expenses, BDT.
+- name: how_do_you_know_the_mf
+  source: audio
+  type: text
+  description: How the farmer knows the market facilitator (MF), in romanized Bangla like the CEX agents write it.
+- name: relation_with_mf
+  source: audio
+  type: text
+  description: Farmer's relationship with the MF ('N/A' if none).
+- name: loan_purpose
+  source: audio
+  type: text
+  description: What the farmer will use the new iFarmer loan for.
+- name: portfolio_name_crops
+  source: audio
+  type: text
+  description: Crop the loan is for, if discussed.
+- name: portfolio_name_livestock
+  source: audio
+  type: text
+  description: Livestock the loan is for, if discussed.
+- name: portfolio_name_vegetable
+  source: audio
+  type: text
+  description: Vegetable the loan is for, if discussed.
+- name: portfolio_name_fish
+  source: audio
+  type: text
+  description: Fish the loan is for, if discussed.
+- name: portfolio_name_fruits
+  source: audio
+  type: text
+  description: Fruit the loan is for, if discussed.
+- name: cow_rearing_experiance
+  source: audio
+  type: number
+  description: Years of experience rearing cows.
+- name: maize_season
+  source: audio
+  type: text
+  description: Season in which maize is grown, as stated.
+- name: maize_harvest_month
+  source: audio
+  type: text
+  description: Month(s) in which maize is harvested, as stated.
+- name: potato_season
+  source: audio
+  type: text
+  description: Season in which potato is grown, as stated.
+- name: potato_harvest_month
+  source: audio
+  type: text
+  description: Month(s) in which potato is harvested, as stated.
+- name: paddy_season
+  source: audio
+  type: text
+  description: Season in which paddy is grown, as stated.
+- name: paddy_harvest_month
+  source: audio
+  type: text
+  description: Month(s) in which paddy is harvested, as stated.
+- name: onion_season
+  source: audio
+  type: text
+  description: Season in which onion is grown, as stated.
+- name: onion_harvest_month
+  source: audio
+  type: text
+  description: Month(s) in which onion is harvested, as stated.
+- name: chili_season
+  source: audio
+  type: text
+  description: Season in which chili is grown, as stated.
+- name: chili_harvest_month
+  source: audio
+  type: text
+  description: Month(s) in which chili is harvested, as stated.
+- name: mustard_season
+  source: audio
+  type: text
+  description: Season in which mustard is grown, as stated.
+- name: mustard_harvest_month
+  source: audio
+  type: text
+  description: Month(s) in which mustard is harvested, as stated.
+- name: others_crop_harvest_month
+  source: audio
+  type: text
+  description: Harvest month(s) of other crops, as stated.
+- name: other_answers
+  source: audio
+  type: text
+  description: Anything important the farmer said that has no field above, in romanized Bangla.
+- name: eng_notes
+  source: audio
+  type: text
+  description: Same summary as Notes, written in plain English.
