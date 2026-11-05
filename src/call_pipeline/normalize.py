@@ -11,6 +11,7 @@ from .schema import Field, Schema
 
 _BN_DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
 _NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
+_BN_SCRIPT = re.compile(r"[ঀ-৿]")
 
 
 def format_ts(text: str) -> str:
@@ -119,6 +120,9 @@ def build_row(raw: dict, schema: Schema) -> CallRow:
             row.issues.append(Issue("", "warning", f"transcript time goes backwards at {time}"))
         prev = max(prev, secs if secs is not None else prev)
         row.transcript.append({"speaker": turn.get("speaker", "other"), "time": time, "text": text})
+
+    if any(_BN_SCRIPT.search(t["text"]) for t in row.transcript):
+        row.issues.append(Issue("", "warning", "transcript contains Bangla-script characters (expected Banglish only)"))
 
     ca = raw.get("call_assessment") or {}
     if not ca.get("is_kyc_call", True):

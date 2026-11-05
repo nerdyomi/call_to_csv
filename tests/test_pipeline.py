@@ -235,3 +235,10 @@ def test_daily_quota_stops_batch_without_sleeping(tmp_path):
     with pytest.raises(QuotaExhausted):          # second recording: no API call at all
         ex.extract(rec, "go")
     assert Models.calls == 1
+
+
+def test_bangla_script_in_transcript_is_flagged(schema):
+    raw = {"transcript": [{"speaker": "CEX", "time": "00:00:01", "text": "7 jon ki ekshathe, \u09a8\u09be\u0995\u09bf alada?"}]}
+    assert any("Bangla-script" in i.detail for i in build_row(raw, schema).issues)
+    raw["transcript"][0]["text"] = "7 jon ki ekshathe, naki alada?"
+    assert not any("Bangla-script" in i.detail for i in build_row(raw, schema).issues)

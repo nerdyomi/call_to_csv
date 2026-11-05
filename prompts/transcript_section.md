@@ -12,6 +12,6 @@ Rules for each turn (`speaker`, `time`, `text`):
   - Keep the speaker's own words and dialect; do not rephrase, summarise or "correct" them.
   - Keep numbers as they were said, e.g. `chollish hajar`, not `40000`. English words stay in English.
   - Use `[inaudible]` for words you cannot make out. Never fill the gap with a guess.
-  - Do not translate to English and do not use Bangla script.
+  - Do not translate to English. **Never output a Bangla-script character** (no নাকি, আমি, etc.): write every Bangla word in English letters, e.g. `naki`, `ami`.
 - One turn per speaker change. Do not merge two speakers into one turn. Include greetings, fillers that carry meaning, and the closing, but leave out long silences, hold music and ringing.
 - If the recording has no speech at all, return an empty `transcript` and say so in `warnings`.
