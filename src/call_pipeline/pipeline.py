@@ -73,7 +73,8 @@ def run(settings: Settings, force: bool = False, limit: int | None = None,
     ok = failed = 0
     if todo:
         extractor = extractor or GeminiExtractor(
-            settings, build_system_prompt(settings, schema), build_response_schema(schema))
+            settings, build_system_prompt(settings, schema),
+            build_response_schema(schema, settings.include_transcript))
         with ThreadPoolExecutor(max_workers=max(settings.workers, 1)) as pool:
             futures = [pool.submit(extract_one, r, extractor, settings) for r in todo]
             for fut in as_completed(futures):
@@ -106,5 +107,5 @@ def rebuild(settings: Settings, schema: Schema | None = None) -> int:
         results[stem] = (build_row(payload["response"], schema), base)
 
     write_outputs(settings.output_dir, results, schema, settings.csv_encoding,
-                  settings.main_csv, settings.evidence_csv, settings.review_csv)
+                  settings.main_csv, settings.evidence_csv, settings.review_csv, settings.transcript_csv)
     return len(results)

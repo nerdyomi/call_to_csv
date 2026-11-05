@@ -22,6 +22,9 @@ class Settings:
     schema_path: Path
     pricing_path: Path
     system_prompt_path: Path
+    transcript_prompt_path: Path
+    include_transcript: bool
+    transcript_csv: str
     audio_extensions: tuple[str, ...]
     inline_limit_bytes: int
     filename_regex: str
@@ -76,6 +79,9 @@ def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settin
         schema_path=path("schema"),
         pricing_path=path("pricing"),
         system_prompt_path=path("system_prompt"),
+        transcript_prompt_path=path("transcript_prompt"),
+        include_transcript=bool(cfg["extraction"]["include_transcript"]),
+        transcript_csv="transcript.txt",
         audio_extensions=tuple(e.lower() for e in a["extensions"]),
         inline_limit_bytes=int(a["inline_limit_mb"] * 1024 * 1024),
         filename_regex=f["regex"],

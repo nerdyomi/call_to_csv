@@ -41,10 +41,22 @@ class GeminiResult:
     model: str = ""
 
 
+MAX_RETRY_WAIT = 120  # seconds; a longer server-side wait means a daily quota, which retrying cannot fix
+
+
+class QuotaExhausted(RuntimeError):
+    """The API says to come back much later (e.g. free-tier requests per day). Do not keep retrying."""
+
+
 def _retry_delay(exc: Exception, default: float) -> float:
-    """Honour 'retry in 12.3s' hints from 429 responses."""
-    m = re.search(r"retry(?:Delay)?\D{0,12}(\d+(?:\.\d+)?)\s*s", str(exc), re.I)
-    return float(m.group(1)) + 1 if m else default
+    """Honour 'retry in 12.3s' hints from 429 responses ('1h2m3.4s' forms are converted too)."""
+    m = re.search(r"retry in\s+((?:\d+(?:\.\d+)?[hms])+)", str(exc), re.I)
+    if not m:
+        m = re.search(r"retryDelay\D{0,6}((?:\d+(?:\.\d+)?[hms])+)", str(exc), re.I)
+    if not m:
+        return default
+    secs = sum(float(n) * {"h": 3600, "m": 60, "s": 1}[u.lower()] for n, u in re.findall(r"(\d+(?:\.\d+)?)([hms])", m.group(1)))
+    return secs + 1
 
 
 def _is_retryable(exc: Exception) -> bool:
@@ -84,6 +96,7 @@ class GeminiExtractor:
         self.response_schema = response_schema
         self.client = client or genai.Client(api_key=settings.api_key)
         self.limiter = RateLimiter(settings.requests_per_minute)
+        self.quota_exhausted: str | None = None  # set once the API says to wait hours; stops the rest of the batch
 
     def _config(self) -> types.GenerateContentConfig:
         kwargs = dict(
@@ -109,6 +122,8 @@ class GeminiExtractor:
         return types.Part.from_uri(file_uri=up.uri, mime_type=rec.mime_type), up
 
     def extract(self, rec: Recording, instruction: str) -> GeminiResult:
+        if self.quota_exhausted:
+            raise QuotaExhausted(self.quota_exhausted)
         part, uploaded = self._audio_part(rec)
         try:
             return self._generate_with_retry(part, instruction, rec.name)
@@ -135,6 +150,9 @@ class GeminiExtractor:
                 if not _is_retryable(exc) or attempt == self.s.max_retries:
                     break
                 delay = _retry_delay(exc, self.s.retry_base_seconds * 2 ** attempt)
+                if delay > MAX_RETRY_WAIT:
+                    self.quota_exhausted = f"{str(exc)[:200]} (server asks to wait {delay / 3600:.1f} h)"
+                    raise QuotaExhausted(self.quota_exhausted) from exc
                 log.warning("%s: attempt %d failed (%s); retrying in %.0fs", label, attempt + 1,
                             str(exc)[:120], delay)
                 time.sleep(delay)

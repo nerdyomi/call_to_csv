@@ -8,6 +8,7 @@ paths:
   schema: config/schema.yaml
   pricing: config/pricing.yaml
   system_prompt: prompts/system_prompt.md
+  transcript_prompt: prompts/transcript_section.md
 
 audio:
   extensions: [.mp3, .mpeg, .mpga, .wav, .m4a, .aac, .ogg, .flac]
@@ -19,6 +20,9 @@ filename:
   regex: '^(?:(?P<date>\d{8})-(?P<time>\d{6})_.*?_)?(?P<phone>0?1\d{9})(?:-.*)?$'
   timezone_offset: "+0600"
   phone_country_prefix: "88"
+
+extraction:
+  include_transcript: true          # transcript (Banglish dialogue) in the same Gemini call
 
 model:
   temperature: 0.0

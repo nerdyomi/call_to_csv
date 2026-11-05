@@ -52,7 +52,7 @@ For every entry in `fields`:
 
 - `confidence`: `high` – clearly and directly stated; `medium` – stated but slightly unclear, or requires a calculation/conversion; `low` – hard to hear, ambiguous, or you had to choose between interpretations. Prefer a `low` entry with a warning to silently guessing, but do not fill fields you cannot support at all.
 - `evidence`: the short phrase from the call that supports the value, in romanized Bangla or the original wording (max ~20 words). For conversions, show the working ("3 bigha x 33 = 99 shotok").
-- `timestamp`: where the answer is given, `mm:ss`.
+- `timestamp`: where the answer is given, `HH:MM:SS` (e.g. `00:01:48`).
 
 # NOTES
 

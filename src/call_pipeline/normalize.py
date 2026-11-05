@@ -13,6 +13,19 @@ _BN_DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
 _NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
 
 
+def format_ts(text: str) -> str:
+    """'7' -> '00:00:07', '01:48' -> '00:01:48', '1:02:03' -> '01:02:03'. Unparseable input is returned as is."""
+    t = (text or "").strip().translate(_BN_DIGITS)
+    parts = t.split(":")
+    if not t or not all(p.strip().isdigit() for p in parts) or len(parts) > 3:
+        return t
+    nums = [int(p) for p in parts]
+    while len(nums) < 3:
+        nums.insert(0, 0)
+    h, m, s = nums
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
 @dataclass
 class Issue:
     field: str
@@ -25,6 +38,7 @@ class CallRow:
     values: dict[str, str] = field(default_factory=dict)       # column -> cell text
     evidence: dict[str, dict] = field(default_factory=dict)    # column -> {value, confidence, evidence, timestamp}
     issues: list[Issue] = field(default_factory=list)
+    transcript: list[dict] = field(default_factory=list)       # [{speaker, time, text}]
 
 
 def parse_number(text: str) -> str | None:
@@ -87,11 +101,24 @@ def build_row(raw: dict, schema: Schema) -> CallRow:
             continue
         row.values[name] = value
         row.evidence[name] = {k: item.get(k, "") for k in ("confidence", "evidence", "timestamp")} | {"value": value}
+        row.evidence[name]["timestamp"] = format_ts(row.evidence[name]["timestamp"])
         if item.get("confidence") == "low":
             row.issues.append(Issue(name, "low_confidence", item.get("evidence", "")))
 
     row.values["Notes"] = (raw.get("notes") or "").strip()
     row.values["eng_notes"] = (raw.get("eng_notes") or "").strip()
+
+    prev = -1
+    for turn in raw.get("transcript") or []:
+        text = (turn.get("text") or "").strip()
+        if not text:
+            continue
+        time = format_ts(turn.get("time", ""))
+        secs = sum(int(x) * m for x, m in zip(reversed(time.split(":")), (1, 60, 3600))) if re.fullmatch(r"\d\d:\d\d:\d\d", time) else None
+        if secs is not None and secs < prev:
+            row.issues.append(Issue("", "warning", f"transcript time goes backwards at {time}"))
+        prev = max(prev, secs if secs is not None else prev)
+        row.transcript.append({"speaker": turn.get("speaker", "other"), "time": time, "text": text})
 
     ca = raw.get("call_assessment") or {}
     if not ca.get("is_kyc_call", True):

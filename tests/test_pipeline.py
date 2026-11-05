@@ -141,3 +141,97 @@ def test_evaluate_statuses_and_phone_matching(schema):
     assert "number_of_goats" not in cells                   # column absent from that sheet's form version
     assert "number_of_cows" in cells and cells["number_of_cows"]["status"] == "missed"
     assert "recall" in summarize(list(cells.values()), 1)
+
+
+# ---- Phase 1a: transcript in the same pass ----
+
+def test_response_schema_puts_transcript_first_and_can_switch_off(schema):
+    on = build_response_schema(schema, include_transcript=True)
+    assert list(on["properties"])[0] == "transcript" and "transcript" in on["required"]
+    turn = on["properties"]["transcript"]["items"]["properties"]
+    assert turn["speaker"]["enum"] == ["CEX", "farmer", "other"]
+    off = build_response_schema(schema, include_transcript=False)
+    assert "transcript" not in off["properties"] and "transcript" not in off["required"]
+
+
+def test_system_prompt_includes_transcript_section_only_when_enabled(schema):
+    s = load_settings(require_key=False)
+    assert "TRANSCRIPT" in build_system_prompt(s, schema)
+    assert "TRANSCRIPT" not in build_system_prompt(replace(s, include_transcript=False), schema)
+
+
+def test_transcript_normalization_and_ordering_warning(schema):
+    raw = {"transcript": [{"speaker": "CEX", "time": "7", "text": " as salam oa alaikum. "},
+                          {"speaker": "farmer", "time": "00:14", "text": "ji bujhte parsi."},
+                          {"speaker": "CEX", "time": "00:00:10", "text": "loan lagbe?"},
+                          {"speaker": "farmer", "time": "00:00:20", "text": "  "}],
+           "fields": [{"field": "loan_amount", "value": "40000", "confidence": "high", "evidence": "q",
+                       "timestamp": "01:48"}]}
+    row = build_row(raw, schema)
+    assert row.transcript == [{"speaker": "CEX", "time": "00:00:07", "text": "as salam oa alaikum."},
+                              {"speaker": "farmer", "time": "00:00:14", "text": "ji bujhte parsi."},
+                              {"speaker": "CEX", "time": "00:00:10", "text": "loan lagbe?"}]   # blank turn dropped
+    assert row.evidence["loan_amount"]["timestamp"] == "00:01:48"
+    assert any("goes backwards at 00:00:10" in i.detail for i in row.issues)
+
+
+def test_format_transcript_matches_requested_layout():
+    from call_pipeline.writer import format_transcript
+    out = format_transcript([{"speaker": "CEX", "time": "00:00:07", "text": "as salam oa alaikum."},
+                             {"speaker": "farmer", "time": "00:00:14", "text": "ji bujhte parsi."}])
+    assert out == "CEX: as salam oa alaikum. (00:00:07)\nfarmer: ji bujhte parsi. (00:00:14)\n"
+
+
+@pytest.mark.skipif(not SAMPLE.exists(), reason="reference recording missing")
+def test_end_to_end_writes_transcript_txt(tmp_path):
+    inp = tmp_path / "in"
+    inp.mkdir()
+    shutil.copy(SAMPLE, inp / SAMPLE.name)
+
+    class WithTranscript(FakeExtractor):
+        def extract(self, rec, instruction):
+            res = super().extract(rec, instruction)
+            res.data["transcript"] = [{"speaker": "CEX", "time": "00:00:07", "text": "as salam oa alaikum."}]
+            return res
+
+    s = replace(load_settings(require_key=False), input_dir=inp, output_dir=tmp_path / "out",
+                manifest=tmp_path / "none.csv")
+    pipeline.run(s, extractor=WithTranscript())
+    f = tmp_path / "out" / SAMPLE.stem / "transcript.txt"
+    assert f.read_text(encoding="utf-8") == "CEX: as salam oa alaikum. (00:00:07)\n"
+
+
+# ---- retry behaviour ----
+
+def test_retry_delay_parsing_and_quota_fail_fast():
+    from call_pipeline.gemini_client import _retry_delay
+    assert _retry_delay(Exception("Please retry in 12.5s."), 99) == 13.5
+    assert _retry_delay(Exception("Please retry in 20h23m15.2s."), 99) == 20 * 3600 + 23 * 60 + 16.2
+    assert _retry_delay(Exception("boom"), 99) == 99
+
+
+def test_daily_quota_stops_batch_without_sleeping(tmp_path):
+    from google.genai import errors
+    from call_pipeline.gemini_client import GeminiExtractor, QuotaExhausted
+
+    class Models:
+        calls = 0
+
+        def generate_content(self, **kw):
+            Models.calls += 1
+            raise errors.ClientError(429, {"error": {"code": 429, "status": "RESOURCE_EXHAUSTED",
+                                                     "message": "Quota exceeded, limit: 20. Please retry in 20h23m15.2s."}})
+
+    class Client:
+        models = Models()
+
+    rec_file = tmp_path / "a.mp3"
+    rec_file.write_bytes(b"x")
+    s = replace(load_settings(require_key=False), requests_per_minute=6000)
+    ex = GeminiExtractor(s, "sys", {"type": "object"}, client=Client())
+    rec = audio.Recording(rec_file)
+    with pytest.raises(QuotaExhausted):
+        ex.extract(rec, "go")
+    with pytest.raises(QuotaExhausted):          # second recording: no API call at all
+        ex.extract(rec, "go")
+    assert Models.calls == 1

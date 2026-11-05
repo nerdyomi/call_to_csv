@@ -22,8 +22,14 @@ EVIDENCE_COLS = ["recording", "field", "value", "confidence", "evidence", "times
 REVIEW_COLS = ["recording", "field", "kind", "detail"]
 
 
+def format_transcript(turns: list[dict]) -> str:
+    """'CEX: as salam oa alaikum. (00:00:07)' one line per turn."""
+    return "\n".join(f"{t['speaker']}: {t['text']} ({t['time']})" for t in turns) + ("\n" if turns else "")
+
+
 def write_outputs(out_dir: Path, results: dict[str, tuple[CallRow, dict[str, str]]], schema: Schema,
-                  encoding: str, main_csv: str, evidence_csv: str, review_csv: str) -> None:
+                  encoding: str, main_csv: str, evidence_csv: str, review_csv: str,
+                  transcript_file: str = "transcript.txt") -> None:
     """`results`: recording stem -> (CallRow, base values from manifest/filename).
 
     Writes output/<stem>/{CEX,evidence,review}.csv for each call and the same three files
@@ -40,6 +46,8 @@ def write_outputs(out_dir: Path, results: dict[str, tuple[CallRow, dict[str, str
         _write(d / main_csv, schema.columns, [main], encoding)
         _write(d / evidence_csv, EVIDENCE_COLS, ev, encoding)
         _write(d / review_csv, REVIEW_COLS, rev, encoding)
+        if row.transcript:
+            (d / transcript_file).write_text(format_transcript(row.transcript), encoding="utf-8")
         all_main.append(main)
         all_ev += ev
         all_review += rev
