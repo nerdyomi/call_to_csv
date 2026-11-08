@@ -227,7 +227,7 @@ def test_daily_quota_stops_batch_without_sleeping(tmp_path):
 
     rec_file = tmp_path / "a.mp3"
     rec_file.write_bytes(b"x")
-    s = replace(load_settings(require_key=False), requests_per_minute=6000)
+    s = replace(load_settings(require_key=False), requests_per_minute=6000, fallback_models=(), api_keys=("k-one",))
     ex = GeminiExtractor(s, "sys", {"type": "object"}, client=Client())
     rec = audio.Recording(rec_file)
     with pytest.raises(QuotaExhausted):
@@ -242,3 +242,113 @@ def test_bangla_script_in_transcript_is_flagged(schema):
     assert any("Bangla-script" in i.detail for i in build_row(raw, schema).issues)
     raw["transcript"][0]["text"] = "7 jon ki ekshathe, naki alada?"
     assert not any("Bangla-script" in i.detail for i in build_row(raw, schema).issues)
+
+
+# ---- key + model failover ----
+
+class _Resp:
+    usage_metadata = None
+    text = '{"fields": [], "call_assessment": {}, "notes": "", "eng_notes": "", "warnings": []}'
+
+
+def _err(code, msg=""):
+    from google.genai import errors
+    cls = errors.ServerError if code >= 500 else errors.ClientError
+    return cls(code, {"error": {"code": code, "message": msg or f"http {code}", "status": "X"}})
+
+
+class FakeClient:
+    """behaviour: callable(model) -> None (ok) or an exception to raise."""
+    def __init__(self, behaviour):
+        self.behaviour, self.calls = behaviour, []
+        outer = self
+
+        class Models:
+            def generate_content(self, model, contents, config):
+                outer.calls.append(model)
+                err = outer.behaviour(model)
+                if err:
+                    raise err
+                return _Resp()
+        self.models = Models()
+
+
+def _extractor(tmp_path, clients, models=("m1", "m2")):
+    from call_pipeline.gemini_client import GeminiExtractor
+    f = tmp_path / "a.mp3"
+    f.write_bytes(b"x")
+    s = replace(load_settings(require_key=False), requests_per_minute=60000, retry_base_seconds=0,
+                max_retries=1, api_keys=tuple(f"key-{i}" for i in range(len(clients))),
+                model=models[0], fallback_models=tuple(models[1:]))
+    return GeminiExtractor(s, "sys", {"type": "object"}, clients=clients), audio.Recording(f)
+
+
+DAILY = "Quota exceeded. Please retry in 20h23m15.2s."
+
+
+def test_failover_to_second_key_when_first_is_out_of_daily_quota(tmp_path):
+    c1, c2 = FakeClient(lambda m: _err(429, DAILY)), FakeClient(lambda m: None)
+    ex, rec = _extractor(tmp_path, [c1, c2], models=("m1",))
+    r = ex.extract(rec, "go")
+    assert (r.model, r.key_tail) == ("m1", "ey-1")
+    ex.extract(rec, "go")
+    assert len(c1.calls) == 1 and len(c2.calls) == 2          # key 1 is skipped after it was dropped
+
+
+def test_overload_503_tries_next_key_but_does_not_drop_the_first(tmp_path):
+    state = {"down": True}
+    c1 = FakeClient(lambda m: _err(503) if state["down"] else None)
+    c2 = FakeClient(lambda m: None)
+    ex, rec = _extractor(tmp_path, [c1, c2], models=("m1",))
+    assert ex.extract(rec, "go").key_tail == "ey-1"
+    assert len(c1.calls) == 2                                  # 1 try + 1 retry, then moved on
+    state["down"] = False
+    assert ex.extract(rec, "go").key_tail == "ey-0"       # key 1 was not dropped
+
+
+def test_fallback_model_used_when_main_model_quota_is_gone_on_all_keys(tmp_path):
+    c1 = FakeClient(lambda m: _err(429, DAILY) if m == "m1" else None)
+    c2 = FakeClient(lambda m: _err(429, DAILY) if m == "m1" else None)
+    ex, rec = _extractor(tmp_path, [c1, c2], models=("m1", "m2"))
+    r = ex.extract(rec, "go")
+    assert r.model == "m2" and r.key_tail == "ey-0"
+    assert c1.calls == ["m1", "m2"] and c2.calls == ["m1"]
+
+
+def test_rejected_key_is_dropped_for_every_model(tmp_path):
+    c1, c2 = FakeClient(lambda m: _err(403, "free tier not available")), FakeClient(lambda m: None)
+    ex, rec = _extractor(tmp_path, [c1, c2], models=("m1", "m2"))
+    ex.extract(rec, "go")
+    ex.extract(rec, "go")
+    assert c1.calls == ["m1"]                                  # never asked again, not even for m2
+
+
+def test_everything_exhausted_raises_quota_and_makes_no_more_calls(tmp_path):
+    from call_pipeline.gemini_client import QuotaExhausted
+    c1, c2 = FakeClient(lambda m: _err(429, DAILY)), FakeClient(lambda m: _err(403))
+    ex, rec = _extractor(tmp_path, [c1, c2], models=("m1",))
+    with pytest.raises(QuotaExhausted) as e:
+        ex.extract(rec, "go")
+    assert "no usable Gemini key" in str(e.value)
+    n = len(c1.calls) + len(c2.calls)
+    with pytest.raises(QuotaExhausted):
+        ex.extract(rec, "go")
+    assert len(c1.calls) + len(c2.calls) == n
+
+
+def test_bad_request_is_not_retried_or_failed_over(tmp_path):
+    c1, c2 = FakeClient(lambda m: _err(400, "invalid schema")), FakeClient(lambda m: None)
+    ex, rec = _extractor(tmp_path, [c1, c2])
+    from google.genai import errors
+    with pytest.raises(errors.APIError):
+        ex.extract(rec, "go")
+    assert len(c1.calls) == 1 and c2.calls == []
+
+
+def test_all_503_fails_the_call_but_not_the_batch(tmp_path):
+    from google.genai import errors
+    c1, c2 = FakeClient(lambda m: _err(503)), FakeClient(lambda m: _err(503))
+    ex, rec = _extractor(tmp_path, [c1, c2], models=("m1",))
+    with pytest.raises(errors.ServerError):
+        ex.extract(rec, "go")
+    assert ex.quota_exhausted is None                          # nothing dropped: next call may succeed

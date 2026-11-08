@@ -1,4 +1,10 @@
-"""Thin wrapper around google-genai: upload/inline audio, throttle, retry, parse JSON."""
+"""Thin wrapper around google-genai: upload/inline audio, throttle, retry, parse JSON.
+
+Failover: every (model, API key) pair is tried in order - first the main model on each key,
+then each fallback model on each key. A pair is dropped for the rest of the run when its daily
+quota is used up, its key is rejected, or the model is unavailable. Overload errors (503) are
+retried briefly and then the next pair is tried, without dropping anything.
+"""
 from __future__ import annotations
 
 import json
@@ -15,6 +21,8 @@ from .audio import Recording
 from .config import Settings
 
 log = logging.getLogger(__name__)
+
+MAX_RETRY_WAIT = 120  # seconds; a longer server-side wait means a daily quota, which retrying cannot fix
 
 
 class RateLimiter:
@@ -39,13 +47,11 @@ class GeminiResult:
     data: dict
     usage: dict = field(default_factory=dict)
     model: str = ""
-
-
-MAX_RETRY_WAIT = 120  # seconds; a longer server-side wait means a daily quota, which retrying cannot fix
+    key_tail: str = ""   # last 4 characters of the API key that served the call (never the whole key)
 
 
 class QuotaExhausted(RuntimeError):
-    """The API says to come back much later (e.g. free-tier requests per day). Do not keep retrying."""
+    """Every key/model combination is unusable for now (daily quota, rejected key, model gone)."""
 
 
 def _retry_delay(exc: Exception, default: float) -> float:
@@ -59,10 +65,30 @@ def _retry_delay(exc: Exception, default: float) -> float:
     return secs + 1
 
 
-def _is_retryable(exc: Exception) -> bool:
+def classify(exc: Exception, default_delay: float) -> tuple[str, float]:
+    """What to do after an error.
+
+    retry  - temporary; try the same key+model again after the returned delay
+    quota  - this key+model has no allowance left for hours: drop the pair
+    key    - this API key is rejected / not allowed: drop the key (all models)
+    model  - model not available to this key: drop the pair
+    fatal  - our request is wrong: do not retry anywhere
+    """
     if isinstance(exc, errors.APIError):
-        return exc.code in (408, 429, 500, 502, 503, 504)
-    return isinstance(exc, (ConnectionError, TimeoutError, json.JSONDecodeError))
+        code, text = exc.code, str(exc)
+        if code == 429:
+            delay = _retry_delay(exc, default_delay)
+            return ("quota", delay) if delay > MAX_RETRY_WAIT else ("retry", delay)
+        if code in (408, 500, 502, 503, 504):
+            return "retry", default_delay
+        if code in (401, 403) or (code == 400 and re.search(r"API[_ ]KEY", text, re.I)):
+            return "key", 0
+        if code == 404:
+            return "model", 0
+        return "fatal", 0
+    if isinstance(exc, (ConnectionError, TimeoutError, json.JSONDecodeError)):
+        return "retry", default_delay
+    return "fatal", 0
 
 
 def _usage_dict(resp) -> dict:
@@ -90,14 +116,54 @@ def _usage_dict(resp) -> dict:
 
 
 class GeminiExtractor:
-    def __init__(self, settings: Settings, system_prompt: str, response_schema: dict, client=None):
+    def __init__(self, settings: Settings, system_prompt: str, response_schema: dict,
+                 clients: list | None = None, client=None):
+        """`clients` (one per API key, same order) lets tests inject fakes; normally built from settings."""
         self.s = settings
         self.system_prompt = system_prompt
         self.response_schema = response_schema
-        self.client = client or genai.Client(api_key=settings.api_key)
-        self.limiter = RateLimiter(settings.requests_per_minute)
-        self.quota_exhausted: str | None = None  # set once the API says to wait hours; stops the rest of the batch
+        provided = clients if clients is not None else ([client] if client is not None else None)
+        if provided is not None:
+            self.clients = list(provided)
+            keys = list(settings.api_keys)
+            self.tails = [keys[i][-4:] if i < len(keys) else f"fake{i}" for i in range(len(provided))]
+        else:
+            self.clients = [genai.Client(api_key=k) for k in settings.api_keys]
+            self.tails = [k[-4:] for k in settings.api_keys]
+        self.limiters = [RateLimiter(settings.requests_per_minute) for _ in self.clients]
+        self.models = list(settings.models)
+        self._dead_pairs: dict[tuple[str, int], str] = {}
+        self._dead_keys: dict[int, str] = {}
+        self._lock = threading.Lock()
+        self._uploads: dict = {}
 
+    # ---- availability bookkeeping ------------------------------------------------------------
+    def _available(self) -> list[tuple[str, int]]:
+        with self._lock:
+            return [(m, k) for m in self.models for k in range(len(self.clients))
+                    if k not in self._dead_keys and (m, k) not in self._dead_pairs]
+
+    @property
+    def quota_exhausted(self) -> str | None:
+        """Non-empty text once nothing is usable any more (stops the rest of the batch)."""
+        if self._available():
+            return None
+        with self._lock:
+            why = [f"key ...{self.tails[k]}: {r}" for k, r in self._dead_keys.items()]
+            why += [f"{m} on key ...{self.tails[k]}: {r}" for (m, k), r in self._dead_pairs.items()]
+        return "no usable Gemini key/model left - " + "; ".join(why)
+
+    def _drop(self, kind: str, model: str, k: int, exc: Exception) -> None:
+        reason = f"{kind} ({str(exc)[:110].strip()})"
+        with self._lock:
+            if kind == "key":
+                self._dead_keys[k] = reason
+            else:
+                self._dead_pairs[(model, k)] = reason
+        log.warning("dropping %s on key ...%s for this run: %s",
+                    "key" if kind == "key" else model, self.tails[k], reason)
+
+    # ---- request building --------------------------------------------------------------------
     def _config(self) -> types.GenerateContentConfig:
         kwargs = dict(
             system_instruction=self.system_prompt,
@@ -109,51 +175,71 @@ class GeminiExtractor:
             kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=int(self.s.thinking_budget))
         return types.GenerateContentConfig(**kwargs)
 
-    def _audio_part(self, rec: Recording):
-        """Returns (part, uploaded_file_or_None)."""
+    def _audio_part(self, rec: Recording, k: int, uploads: dict):
+        """Inline bytes for normal files; big files are uploaded once per key (uploads belong to one key)."""
         if rec.size <= self.s.inline_limit_bytes:
-            return types.Part.from_bytes(data=rec.path.read_bytes(), mime_type=rec.mime_type), None
-        up = self.client.files.upload(file=str(rec.path), config=types.UploadFileConfig(mime_type=rec.mime_type))
-        while up.state and up.state.name == "PROCESSING":
-            time.sleep(2)
-            up = self.client.files.get(name=up.name)
-        if up.state and up.state.name == "FAILED":
-            raise RuntimeError(f"Gemini failed to process uploaded audio {rec.name}")
-        return types.Part.from_uri(file_uri=up.uri, mime_type=rec.mime_type), up
+            return types.Part.from_bytes(data=rec.path.read_bytes(), mime_type=rec.mime_type)
+        if k not in uploads:
+            client = self.clients[k]
+            up = client.files.upload(file=str(rec.path), config=types.UploadFileConfig(mime_type=rec.mime_type))
+            while up.state and up.state.name == "PROCESSING":
+                time.sleep(2)
+                up = client.files.get(name=up.name)
+            if up.state and up.state.name == "FAILED":
+                raise RuntimeError(f"Gemini failed to process uploaded audio {rec.name}")
+            uploads[k] = up
+        up = uploads[k]
+        return types.Part.from_uri(file_uri=up.uri, mime_type=rec.mime_type)
 
+    # ---- the call ----------------------------------------------------------------------------
     def extract(self, rec: Recording, instruction: str) -> GeminiResult:
-        if self.quota_exhausted:
-            raise QuotaExhausted(self.quota_exhausted)
-        part, uploaded = self._audio_part(rec)
+        uploads: dict[int, object] = {}
+        last: Exception | None = None
         try:
-            return self._generate_with_retry(part, instruction, rec.name)
-        finally:
-            if uploaded is not None:
+            for model, k in self._available():
+                if k in self._dead_keys or (model, k) in self._dead_pairs:
+                    continue  # another thread dropped it meanwhile
                 try:
-                    self.client.files.delete(name=uploaded.name)
+                    part = self._audio_part(rec, k, uploads)
+                except Exception as exc:
+                    kind, _ = classify(exc, 0)
+                    if kind == "fatal":
+                        raise
+                    last = exc
+                    if kind != "retry":
+                        self._drop(kind, model, k, exc)
+                    continue
+                for attempt in range(self.s.max_retries + 1):
+                    self.limiters[k].wait()
+                    try:
+                        resp = self.clients[k].models.generate_content(
+                            model=model, contents=[part, instruction], config=self._config())
+                        text = resp.text
+                        if not text:
+                            raise json.JSONDecodeError("empty response (blocked or truncated)", "", 0)
+                        return GeminiResult(json.loads(text), _usage_dict(resp), model, self.tails[k])
+                    except Exception as exc:
+                        last = exc
+                        kind, delay = classify(exc, self.s.retry_base_seconds * 2 ** attempt)
+                        if kind == "fatal":
+                            raise
+                        if kind != "retry":
+                            self._drop(kind, model, k, exc)
+                            break
+                        if attempt == self.s.max_retries:
+                            log.warning("%s: %s on key ...%s still failing (%s); trying next",
+                                        rec.name, model, self.tails[k], str(exc)[:100])
+                            break
+                        log.warning("%s: %s key ...%s attempt %d failed (%s); retrying in %.0fs",
+                                    rec.name, model, self.tails[k], attempt + 1, str(exc)[:100], delay)
+                        time.sleep(delay)
+        finally:
+            for k, up in uploads.items():
+                try:
+                    self.clients[k].files.delete(name=up.name)
                 except Exception:  # best effort; files expire on their own after 48h
                     log.warning("could not delete uploaded file for %s", rec.name)
-
-    def _generate_with_retry(self, part, instruction: str, label: str) -> GeminiResult:
-        last: Exception | None = None
-        for attempt in range(self.s.max_retries + 1):
-            self.limiter.wait()
-            try:
-                resp = self.client.models.generate_content(
-                    model=self.s.model, contents=[part, instruction], config=self._config())
-                text = resp.text
-                if not text:
-                    raise json.JSONDecodeError("empty response (blocked or truncated)", "", 0)
-                return GeminiResult(json.loads(text), _usage_dict(resp), self.s.model)
-            except Exception as exc:
-                last = exc
-                if not _is_retryable(exc) or attempt == self.s.max_retries:
-                    break
-                delay = _retry_delay(exc, self.s.retry_base_seconds * 2 ** attempt)
-                if delay > MAX_RETRY_WAIT:
-                    self.quota_exhausted = f"{str(exc)[:200]} (server asks to wait {delay / 3600:.1f} h)"
-                    raise QuotaExhausted(self.quota_exhausted) from exc
-                log.warning("%s: attempt %d failed (%s); retrying in %.0fs", label, attempt + 1,
-                            str(exc)[:120], delay)
-                time.sleep(delay)
-        raise last  # type: ignore[misc]
+        stop = self.quota_exhausted
+        if stop:
+            raise QuotaExhausted(stop)
+        raise last if last else RuntimeError("no Gemini key configured")

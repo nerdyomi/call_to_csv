@@ -26,12 +26,13 @@ extraction:
 
 model:
   temperature: 0.0
+  fallbacks: [gemini-3.6-flash]     # tried (on every key) when the main model's quota is used up; override with GEMINI_FALLBACK_MODELS
   thinking_budget: null             # null = model default, 0 = off (where supported), N = token cap
 
 run:
   workers: 2                        # parallel calls; keep low on the free tier
   requests_per_minute: 8            # client-side throttle; free tier limits are strict
-  max_retries: 5
+  max_retries: 2                    # extra tries per key+model on 503/short 429; then the next key/model is used
   retry_base_seconds: 4
 
 output:

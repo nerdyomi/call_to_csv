@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -14,8 +15,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 @dataclass(frozen=True)
 class Settings:
     root: Path
-    api_key: str
+    api_keys: tuple[str, ...]          # GEMINI_API_KEY, GEMINI_API_KEY_2, ... in that order
     model: str
+    fallback_models: tuple[str, ...]   # tried after `model`, per key, when a model's quota is used up
     input_dir: Path
     manifest: Path
     output_dir: Path
@@ -49,6 +51,15 @@ class Settings:
         return self.call_dir(stem) / "raw.json"
 
     @property
+    def api_key(self) -> str:
+        """First key; kept for scripts that only need one."""
+        return self.api_keys[0] if self.api_keys else ""
+
+    @property
+    def models(self) -> tuple[str, ...]:
+        return (self.model,) + tuple(m for m in self.fallback_models if m != self.model)
+
+    @property
     def usage_log(self) -> Path:
         return self.output_dir / "usage.jsonl"
 
@@ -57,22 +68,40 @@ class Settings:
         return self.output_dir / "errors.jsonl"
 
 
+def _collect_api_keys() -> tuple[str, ...]:
+    """GEMINI_API_KEY, GEMINI_API_KEY_2, GEMINI_API_KEY_3 ... (blank and duplicate values are skipped)."""
+    found = []
+    for name, value in os.environ.items():
+        m = re.fullmatch(r"GEMINI_API_KEY(?:_(\d+))?", name)
+        if m and value.strip():
+            found.append((int(m.group(1) or 1), value.strip()))
+    keys: list[str] = []
+    for _, value in sorted(found):
+        if value not in keys:
+            keys.append(value)
+    return tuple(keys)
+
+
 def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settings:
     load_dotenv(root / ".env")
     cfg = yaml.safe_load((root / "config" / "settings.yaml").read_text(encoding="utf-8"))
     p, a, f, m, r, o = (cfg[k] for k in ("paths", "audio", "filename", "model", "run", "output"))
 
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    if require_key and not api_key:
+    api_keys = _collect_api_keys()
+    if require_key and not api_keys:
         raise SystemExit("GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.")
+    fallback_env = os.getenv("GEMINI_FALLBACK_MODELS")
+    fallbacks = tuple(x.strip() for x in (fallback_env.split(",") if fallback_env is not None
+                                          else m.get("fallbacks") or []) if x.strip())
 
     def path(key: str) -> Path:
         return (root / p[key]).resolve()
 
     return Settings(
         root=root,
-        api_key=api_key,
+        api_keys=api_keys,
         model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip(),
+        fallback_models=fallbacks,
         input_dir=path("input_dir"),
         manifest=path("manifest"),
         output_dir=path("output_dir"),

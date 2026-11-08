@@ -39,13 +39,13 @@ def extract_one(rec: audio.Recording, extractor: GeminiExtractor, settings: Sett
         log.error("%s: FAILED: %s", rec.name, str(exc)[:300])
         _append_jsonl(settings.error_log, {"at": _now(), "recording": rec.name, "error": str(exc)[:2000]})
         return False
-    payload = {"recording": rec.name, "source_path": str(rec.path), "model": res.model, "extracted_at": _now(),
+    payload = {"recording": rec.name, "source_path": str(rec.path), "model": res.model, "api_key_tail": res.key_tail, "extracted_at": _now(),
                "usage": res.usage, "response": res.data}
     settings.call_dir(rec.stem).mkdir(parents=True, exist_ok=True)
     tmp = settings.call_dir(rec.stem) / "raw.json.tmp"
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.replace(settings.raw_file(rec.stem))
-    _append_jsonl(settings.usage_log, {"at": _now(), "recording": rec.name, "model": res.model, **res.usage})
+    _append_jsonl(settings.usage_log, {"at": _now(), "recording": rec.name, "model": res.model, "key": res.key_tail, **res.usage})
     log.info("%s: ok (%s)", rec.name, res.usage)
     return True
 
