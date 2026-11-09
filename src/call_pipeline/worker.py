@@ -10,6 +10,7 @@ When every Gemini key/model is out of quota the call goes back to 'queued' and t
 from __future__ import annotations
 
 import logging
+import re
 import tempfile
 import threading
 import time
@@ -28,6 +29,62 @@ from .writer import format_transcript
 log = logging.getLogger(__name__)
 
 NOT_A_FIELD = ("Notes", "eng_notes")
+_TIME_RE = re.compile(r'"time"\s*:\s*"(\d{1,2}(?::\d{2}){1,2})"')
+
+
+def _secs(hms: str) -> int:
+    parts = [int(x) for x in hms.split(":")]
+    while len(parts) < 3:
+        parts.insert(0, 0)
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+
+
+class Progress:
+    """Writes stage + percentage to the calls row so the website can show a live bar.
+
+    The percentage is real while the transcript streams in (last timestamp written / audio length);
+    before that Gemini is 'thinking' and no number exists, so the stage name says so.
+    Never raises; switches itself off if the database has no progress columns (migration 002 not run).
+    """
+
+    def __init__(self, db, call_id: str, duration: float | None, min_interval: float = 2.0):
+        self.db, self.id, self.duration = db, call_id, duration
+        self.min_interval, self.enabled = min_interval, True
+        self.pct, self.stage, self._last_write = 0, None, 0.0
+
+    def set(self, stage: str, pct: int, force: bool = False) -> None:
+        pct = max(self.pct, min(int(pct), 99))     # never goes backwards, 100 is reserved for 'done'
+        changed = stage != self.stage
+        if not self.enabled or (pct == self.pct and not changed):
+            return
+        now = time.monotonic()
+        if not (force or changed or (pct > self.pct and now - self._last_write >= self.min_interval)):
+            return
+        self.pct, self.stage, self._last_write = pct, stage, now
+        try:
+            self.db.update_call(self.id, {"stage": stage, "progress": pct})
+        except Exception as exc:
+            self.enabled = False
+            log.warning("progress updates disabled (run supabase/migrations/002 ?): %s", str(exc)[:160])
+
+    def on_text(self, text: str) -> None:
+        """Called with the growing JSON answer from Gemini."""
+        if '"notes"' in text:
+            self.set("checking", 93)
+        elif '"fields"' in text:
+            self.set("extracting", 86 + min(6, text.count('"confidence"') // 8))
+        elif '"call_assessment"' in text:
+            self.set("extracting", 85)
+        else:
+            times = _TIME_RE.findall(text)
+            if times and self.duration:
+                frac = min(max(_secs(x) for x in times) / self.duration, 1.0)
+                self.set("transcribing", 12 + frac * 72)
+            else:
+                self.set("transcribing", 12)
+
+    def done_patch(self) -> dict:
+        return {"stage": None, "progress": 100} if self.enabled else {}
 
 
 def _now() -> str:
@@ -54,6 +111,8 @@ class Worker:
     def process(self, call: dict) -> str:
         """Runs one claimed call. Returns 'done', 'failed' or 'requeued'."""
         cid, name = call["id"], call["file_name"]
+        prog = Progress(self.db, cid, call.get("duration_seconds"))
+        prog.set("downloading", 3, force=True)
         try:
             data = self.db.download(call["storage_path"])
             with tempfile.TemporaryDirectory() as tmp:
@@ -61,10 +120,13 @@ class Worker:
                 path.write_bytes(data)
                 rec = audio.Recording(path)
                 duration = audio.duration_seconds(path)
-                res = self._get_extractor().extract(rec, USER_INSTRUCTION)
+                prog.duration = duration
+                prog.set("thinking", 8)
+                res = self._get_extractor().extract(rec, USER_INSTRUCTION, on_progress=prog.on_text)
         except QuotaExhausted as exc:
             # not the call's fault: keep it in the queue and wait for the quota to come back
-            self.db.update_call(cid, {"status": "queued", "queued_at": _now(), "error": str(exc)[:500]})
+            self.db.update_call(cid, {"status": "queued", "queued_at": _now(), "error": str(exc)[:500],
+                                      **({"stage": None, "progress": 0} if prog.enabled else {})})
             with self._lock:
                 self._pause_until = time.monotonic() + self.s.quota_pause_minutes * 60
                 self._extractor = None   # fresh key/model bookkeeping after the pause
@@ -77,6 +139,7 @@ class Worker:
             return "failed"
 
         try:
+            prog.set("saving", 96, force=True)
             row = build_row(res.data, self.schema)
             self.db.save_result({
                 "call_id": cid,
@@ -93,7 +156,8 @@ class Worker:
                 "model": res.model,
                 "updated_at": _now(),
             })
-            patch = {"status": "done", "finished_at": _now(), "model": res.model, "error": None}
+            patch = {"status": "done", "finished_at": _now(), "model": res.model, "error": None,
+                     **prog.done_patch()}
             if duration:
                 patch["duration_seconds"] = round(duration, 1)
             self.db.update_call(cid, patch)

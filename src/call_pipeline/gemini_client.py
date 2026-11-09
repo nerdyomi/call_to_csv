@@ -12,6 +12,7 @@ import logging
 import re
 import threading
 import time
+from types import SimpleNamespace
 from dataclasses import dataclass, field
 
 from google import genai
@@ -192,7 +193,25 @@ class GeminiExtractor:
         return types.Part.from_uri(file_uri=up.uri, mime_type=rec.mime_type)
 
     # ---- the call ----------------------------------------------------------------------------
-    def extract(self, rec: Recording, instruction: str) -> GeminiResult:
+    def _generate(self, k: int, model: str, part, instruction: str, on_progress):
+        client, cfg = self.clients[k], self._config()
+        if on_progress is None:
+            return client.models.generate_content(model=model, contents=[part, instruction], config=cfg)
+        text, usage = "", None
+        for chunk in client.models.generate_content_stream(model=model, contents=[part, instruction], config=cfg):
+            piece = chunk.text
+            if piece:
+                text += piece
+                try:
+                    on_progress(text)
+                except Exception:  # progress display must never break an extraction
+                    log.debug("progress callback failed", exc_info=True)
+            if getattr(chunk, "usage_metadata", None):
+                usage = chunk.usage_metadata
+        return SimpleNamespace(text=text, usage_metadata=usage)
+
+    def extract(self, rec: Recording, instruction: str, on_progress=None) -> GeminiResult:
+        """`on_progress(text_so_far)`: when given, the answer is streamed and the callback sees the growing JSON text."""
         uploads: dict[int, object] = {}
         last: Exception | None = None
         try:
@@ -212,8 +231,7 @@ class GeminiExtractor:
                 for attempt in range(self.s.max_retries + 1):
                     self.limiters[k].wait()
                     try:
-                        resp = self.clients[k].models.generate_content(
-                            model=model, contents=[part, instruction], config=self._config())
+                        resp = self._generate(k, model, part, instruction, on_progress)
                         text = resp.text
                         if not text:
                             raise json.JSONDecodeError("empty response (blocked or truncated)", "", 0)

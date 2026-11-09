@@ -384,8 +384,10 @@ class StubExtractor:
     def __init__(self, behaviour=None):
         self.behaviour, self.calls = behaviour, 0
 
-    def extract(self, rec, instruction):
+    def extract(self, rec, instruction, on_progress=None):
         self.calls += 1
+        if on_progress:
+            on_progress('{"transcript": [{"time": "00:00:07"}')
         if self.behaviour:
             self.behaviour()
         return GeminiResult(
@@ -462,3 +464,71 @@ def test_worker_marks_failed_when_saving_result_fails(schema):
     w = _worker(db, StubExtractor(), schema)
     assert w.process(db.claim_next()) == "failed"
     assert "saving failed" in db.updates[-1][1]["error"]
+
+
+# ---- progress reporting ----
+
+def test_progress_follows_transcript_timestamps_and_never_goes_back():
+    from call_pipeline.worker import Progress
+    db = FakeDb([])
+    p = Progress(db, "c1", duration=100, min_interval=0)
+    p.set("thinking", 8)
+    p.on_text('{"transcript": [{"speaker": "CEX", "time": "00:00:10", "text": "a"}')
+    p.on_text('{"transcript": [{"time": "00:00:50", "text": "a"}, {"time": "00:00:20", "text": "b"}')
+    p.on_text('{"transcript": [{"time": "00:01:40"}], "call_assessment": {}, "fields": [{"confidence": "high"}')
+    pcts = [u[1]["progress"] for u in db.updates]
+    assert pcts == sorted(pcts) and pcts[0] == 8
+    assert 12 < pcts[1] < 30 and 45 < pcts[2] < 60     # 10s and 50s of a 100s call
+    assert db.updates[-1][1]["stage"] == "extracting" and pcts[-1] >= 86
+    p.on_text('..."fields": [], "notes": "x"')
+    assert db.updates[-1][1] == {"stage": "checking", "progress": 93}
+
+
+def test_progress_throttles_writes_and_survives_missing_columns():
+    from call_pipeline.worker import Progress
+    db = FakeDb([])
+    p = Progress(db, "c1", duration=1000, min_interval=3600)       # huge interval: only stage changes write
+    p.set("thinking", 8)
+    for sec in range(10, 200, 10):
+        p.on_text('{"transcript": [{"time": "00:%02d:%02d"}' % (sec // 60, sec % 60))
+    assert len(db.updates) == 2                                    # thinking, then the first 'transcribing'
+
+    class NoColumns(FakeDb):
+        def update_call(self, call_id, patch):
+            raise RuntimeError("column calls.progress does not exist")
+    q = Progress(NoColumns([]), "c1", 100)
+    q.set("downloading", 3, force=True)
+    assert q.enabled is False and q.done_patch() == {}
+    q.set("thinking", 8)                                           # no exception after being disabled
+
+
+def test_worker_done_sets_progress_100(schema):
+    db = FakeDb([_call(1)])
+    _worker(db, StubExtractor(), schema).process(db.claim_next())
+    stages = [p.get("stage") for _, p in db.updates if "stage" in p]
+    assert stages[0] == "downloading" and "thinking" in stages and "saving" in stages
+    assert db.updates[-1][1]["progress"] == 100 and db.updates[-1][1]["stage"] is None
+
+
+def test_gemini_streaming_feeds_progress_callback(tmp_path):
+    from types import SimpleNamespace
+
+    class Chunk:
+        def __init__(self, text, usage=None):
+            self.text, self.usage_metadata = text, usage
+
+    class StreamModels:
+        def generate_content_stream(self, model, contents, config):
+            yield Chunk('{"fields": [], "call_assessment": {}, ')
+            yield Chunk('"notes": "", "eng_notes": "", "warnings": []}', SimpleNamespace(
+                prompt_token_count=5, response_token_count=7, thoughts_token_count=1, total_token_count=13,
+                prompt_tokens_details=None))
+
+    class StreamClient:
+        models = StreamModels()
+
+    ex, rec = _extractor(tmp_path, [StreamClient()], models=("m1",))
+    seen = []
+    r = ex.extract(rec, "go", on_progress=seen.append)
+    assert len(seen) == 2 and seen[-1].endswith("[]}") and r.data["notes"] == ""
+    assert r.usage["output_tokens"] == 7 and r.usage["total_tokens"] == 13
