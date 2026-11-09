@@ -27,6 +27,11 @@ class Settings:
     transcript_prompt_path: Path
     include_transcript: bool
     transcript_csv: str
+    supabase_url: str
+    supabase_service_key: str
+    poll_seconds: float
+    stale_minutes: int
+    quota_pause_minutes: float
     audio_extensions: tuple[str, ...]
     inline_limit_bytes: int
     filename_regex: str
@@ -86,6 +91,7 @@ def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settin
     load_dotenv(root / ".env")
     cfg = yaml.safe_load((root / "config" / "settings.yaml").read_text(encoding="utf-8"))
     p, a, f, m, r, o = (cfg[k] for k in ("paths", "audio", "filename", "model", "run", "output"))
+    w = cfg.get("worker", {})
 
     api_keys = _collect_api_keys()
     if require_key and not api_keys:
@@ -111,6 +117,11 @@ def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settin
         transcript_prompt_path=path("transcript_prompt"),
         include_transcript=bool(cfg["extraction"]["include_transcript"]),
         transcript_csv="transcript.txt",
+        supabase_url=os.getenv("SUPABASE_URL", "").strip().rstrip("/"),
+        supabase_service_key=os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip(),
+        poll_seconds=float(w.get("poll_seconds", 5)),
+        stale_minutes=int(w.get("stale_minutes", 30)),
+        quota_pause_minutes=float(w.get("quota_pause_minutes", 30)),
         audio_extensions=tuple(e.lower() for e in a["extensions"]),
         inline_limit_bytes=int(a["inline_limit_mb"] * 1024 * 1024),
         filename_regex=f["regex"],

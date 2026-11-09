@@ -24,6 +24,10 @@ def main(argv: list[str] | None = None) -> None:
     r.add_argument("--limit", type=int, help="process at most N recordings (handy for a first test)")
     r.add_argument("--only", nargs="+", help="only recordings whose file name contains one of these strings")
 
+    wk = sub.add_parser("worker", help="process calls queued from the website (Supabase)")
+    wk.add_argument("--once", action="store_true", help="process everything queued, then exit")
+    wk.add_argument("--model", help="main Gemini model for this run only (fallbacks are disabled)")
+
     sub.add_parser("rebuild", help="rewrite the CSVs from cached results, no API calls")
 
     e = sub.add_parser("evaluate", help="score output/ against hand-filled CEX sheets")
@@ -51,6 +55,19 @@ def main(argv: list[str] | None = None) -> None:
         if res["failed"]:
             print(f"Failures are listed in {s.error_log}; re-run the same command to retry only those.")
             sys.exit(1)
+    elif args.cmd == "worker":
+        from .gemini_client import GeminiExtractor
+        from .prompting import build_response_schema, build_system_prompt
+        from .supa import Supa
+        from .worker import Worker
+        s = load_settings()
+        if args.model:
+            s = replace(s, model=args.model, fallback_models=())
+        schema = load_schema(s.schema_path)
+        system_prompt, response_schema = build_system_prompt(s, schema), build_response_schema(schema, s.include_transcript)
+        print(f"Worker started: {len(s.api_keys)} Gemini key(s), models {', '.join(s.models)}, "
+              f"{s.workers} parallel call(s). {'Processing the queue once.' if args.once else 'Ctrl+C to stop.'}")
+        Worker(Supa(s), lambda: GeminiExtractor(s, system_prompt, response_schema), schema, s).run(once=args.once)
     elif args.cmd == "rebuild":
         s = load_settings(require_key=False)
         print(f"{pipeline.rebuild(s)} rows written to {s.output_dir / s.main_csv}")

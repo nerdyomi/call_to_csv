@@ -352,3 +352,113 @@ def test_all_503_fails_the_call_but_not_the_batch(tmp_path):
     with pytest.raises(errors.ServerError):
         ex.extract(rec, "go")
     assert ex.quota_exhausted is None                          # nothing dropped: next call may succeed
+
+
+# ---- worker (queue -> Gemini -> database) ----
+
+class FakeDb:
+    def __init__(self, calls):
+        self.queue, self.updates, self.results, self.requeued = list(calls), [], [], 0
+
+    def claim_next(self):
+        return self.queue.pop(0) if self.queue else None
+
+    def requeue_stale(self, minutes):
+        self.requeued += 1
+        return 0
+
+    def download(self, path):
+        return b"fake-audio-bytes"
+
+    def update_call(self, call_id, patch):
+        self.updates.append((call_id, patch))
+
+    def save_result(self, payload):
+        self.results.append(payload)
+
+    def last_status(self, call_id):
+        return [p["status"] for c, p in self.updates if c == call_id and "status" in p][-1]
+
+
+class StubExtractor:
+    def __init__(self, behaviour=None):
+        self.behaviour, self.calls = behaviour, 0
+
+    def extract(self, rec, instruction):
+        self.calls += 1
+        if self.behaviour:
+            self.behaviour()
+        return GeminiResult(
+            {"transcript": [{"speaker": "CEX", "time": "00:00:07", "text": "as salam oa alaikum."}],
+             "call_assessment": {"audio_quality": "good", "is_kyc_call": True, "respondent_is_farmer": "yes",
+                                 "language_note": ""},
+             "fields": [item("loan_amount", "40,000"), item("own", "16.5", "low")],
+             "notes": "Farmer loan nibe.", "eng_notes": "Farmer wants a loan.", "warnings": ["w1"]},
+            {"prompt_tokens": 10, "output_tokens": 5}, "m1", "ey-0")
+
+
+def _call(i, name="a.mp3"):
+    return {"id": f"id{i}", "file_name": name, "storage_path": f"p/{i}/{name}", "attempts": 1}
+
+
+def _worker(db, extractor, schema, **over):
+    from call_pipeline.worker import Worker
+    s = replace(load_settings(require_key=False), workers=1, poll_seconds=0.01, quota_pause_minutes=30, **over)
+    return Worker(db, lambda: extractor, schema, s)
+
+
+def test_worker_saves_result_and_marks_done(schema):
+    db = FakeDb([_call(1)])
+    w = _worker(db, StubExtractor(), schema)
+    assert w.process(db.claim_next()) == "done"
+    r = db.results[0]
+    assert r["call_id"] == "id1" and r["model"] == "m1" and r["usage"]["key"] == "ey-0"
+    assert r["fields"] == {"loan_amount": "40000", "own": "16.5"}          # normalised; notes not in fields
+    assert r["transcript_text"] == "CEX: as salam oa alaikum. (00:00:07)\n"
+    assert r["notes"] == "Farmer loan nibe." and r["eng_notes"] == "Farmer wants a loan."
+    assert {i["kind"] for i in r["review"]} == {"low_confidence", "warning"}
+    assert r["evidence"]["own"]["confidence"] == "low"
+    patch = db.updates[-1][1]
+    assert patch["status"] == "done" and patch["model"] == "m1" and patch["error"] is None
+
+
+def test_worker_marks_failed_with_reason(schema):
+    def boom():
+        raise RuntimeError("gemini exploded")
+    db = FakeDb([_call(1)])
+    w = _worker(db, StubExtractor(boom), schema)
+    assert w.process(db.claim_next()) == "failed"
+    assert db.last_status("id1") == "failed" and "gemini exploded" in db.updates[-1][1]["error"]
+    assert db.results == []
+
+
+def test_worker_requeues_and_pauses_when_quota_exhausted(schema):
+    from call_pipeline.gemini_client import QuotaExhausted
+
+    def quota():
+        raise QuotaExhausted("no usable Gemini key/model left")
+    db = FakeDb([_call(1), _call(2)])
+    w = _worker(db, StubExtractor(quota), schema)
+    assert w.process(db.claim_next()) == "requeued"
+    assert db.last_status("id1") == "queued"
+    w.run(once=True)                                  # paused: must not touch call 2
+    assert [c["id"] for c in db.queue] == ["id2"]
+
+
+def test_worker_once_processes_whole_queue_and_requeues_stale_first(schema):
+    db = FakeDb([_call(1), _call(2), _call(3)])
+    ex = StubExtractor()
+    _worker(db, ex, schema).run(once=True)
+    assert ex.calls == 3 and db.queue == [] and db.requeued == 1
+    assert [db.last_status(f"id{i}") for i in (1, 2, 3)] == ["done"] * 3
+
+
+def test_worker_marks_failed_when_saving_result_fails(schema):
+    db = FakeDb([_call(1)])
+
+    def bad_save(payload):
+        raise RuntimeError("db down")
+    db.save_result = bad_save
+    w = _worker(db, StubExtractor(), schema)
+    assert w.process(db.claim_next()) == "failed"
+    assert "saving failed" in db.updates[-1][1]["error"]

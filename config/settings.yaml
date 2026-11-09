@@ -40,3 +40,8 @@ output:
   main_csv: CEX.csv
   review_csv: review.csv            # low-confidence values and warnings, one row per issue
   evidence_csv: evidence.csv        # one row per extracted value with quote + timestamp
+
+worker:                             # python -m call_pipeline worker
+  poll_seconds: 5                   # how often to look for queued calls when idle
+  stale_minutes: 30                 # a call "processing" for longer than this (worker died) goes back to the queue
+  quota_pause_minutes: 30           # when every Gemini key/model is out of quota: put the call back, wait, try again
