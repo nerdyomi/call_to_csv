@@ -70,3 +70,18 @@ Edit `config/schema.yaml`: put the values under `known_values` for a field. They
 - Yield is in **kg** (maund answers are converted at 40 kg). Unit price is assumed to be BDT per **maund**, and income fields yearly BDT: confirm the price unit.
 - Model prices in `pricing.yaml` were typed by hand; check Google's pricing page.
 - Scale path: the cache-per-recording design lets you run the same command on a schedule; moving to a queue/cloud storage would only change `audio.discover` and the writer.
+
+## Web app (`web/`)
+
+Next.js app: login, drag-and-drop upload, Evaluate / Re-evaluate with live progress, call details (summary, fields, conversation with audio, behaviour analysis, per-call AI chat), all-calls sheet with filters and Excel export, and a global AI chat.
+
+```powershell
+cd web
+npm install
+copy .env.example .env.local     # fill in the Supabase + Groq values
+npm run dev                      # http://localhost:3000
+npm test                         # unit tests
+npx tsx --env-file=.env.local scripts/live_ai_check.ts   # live Groq check on a real evaluated call
+```
+
+Evaluation itself is done by the Python worker, which must be running (`python -m call_pipeline worker`). Database changes live in `supabase/` (`schema.sql`, then `migrations/`).

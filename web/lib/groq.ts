@@ -91,13 +91,61 @@ export function stripThink(text: string): string {
   return text.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/^\s+/, "");
 }
 
+/** Streaming filter that hides <think>...</think>, even when a tag is split across chunks. */
+export class ThinkFilter {
+  private pending = "";
+  private inThink = false;
+  private static OPEN = "<think>";
+  private static CLOSE = "</think>";
+
+  /** Length of the longest suffix of `s` that is a proper prefix of `tag` (a tag that may continue in the next chunk). */
+  private static partial(s: string, tag: string): number {
+    for (let n = Math.min(tag.length - 1, s.length); n > 0; n--) if (tag.startsWith(s.slice(s.length - n))) return n;
+    return 0;
+  }
+
+  push(piece: string): string {
+    this.pending += piece;
+    let out = "";
+    for (;;) {
+      if (this.inThink) {
+        const end = this.pending.indexOf(ThinkFilter.CLOSE);
+        if (end < 0) {
+          this.pending = this.pending.slice(this.pending.length - ThinkFilter.partial(this.pending, ThinkFilter.CLOSE));
+          return out;
+        }
+        this.pending = this.pending.slice(end + ThinkFilter.CLOSE.length);
+        this.inThink = false;
+      } else {
+        const start = this.pending.indexOf(ThinkFilter.OPEN);
+        if (start < 0) {
+          const keep = ThinkFilter.partial(this.pending, ThinkFilter.OPEN);
+          out += this.pending.slice(0, this.pending.length - keep);
+          this.pending = this.pending.slice(this.pending.length - keep);
+          return out;
+        }
+        out += this.pending.slice(0, start);
+        this.pending = this.pending.slice(start + ThinkFilter.OPEN.length);
+        this.inThink = true;
+      }
+    }
+  }
+
+  /** End of stream: anything held back that is not inside a think block is real text. */
+  flush(): string {
+    const rest = this.inThink ? "" : this.pending;
+    this.pending = "";
+    return rest;
+  }
+}
+
 /** Streams the answer text piece by piece. */
 export async function* chatStream(messages: GroqMessage[], o: CallOptions = {}): AsyncGenerator<string> {
   const { res } = await withFailover(messages, { ...o, stream: true });
   const reader = res.body!.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  let inThink = false;
+  const filter = new ThinkFilter();
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -108,7 +156,11 @@ export async function* chatStream(messages: GroqMessage[], o: CallOptions = {}):
       buffer = buffer.slice(nl + 1);
       if (!line.startsWith("data:")) continue;
       const payload = line.slice(5).trim();
-      if (payload === "[DONE]") return;
+      if (payload === "[DONE]") {
+        const tail = filter.flush();
+        if (tail) yield tail;
+        return;
+      }
       let piece = "";
       try {
         piece = JSON.parse(payload).choices?.[0]?.delta?.content ?? "";
@@ -116,19 +168,10 @@ export async function* chatStream(messages: GroqMessage[], o: CallOptions = {}):
         continue;
       }
       if (!piece) continue;
-      // hide <think> blocks even when the tags arrive split across chunks
-      let out = "";
-      let rest = piece;
-      while (rest) {
-        if (inThink) {
-          const end = rest.indexOf("</think>");
-          if (end < 0) { rest = ""; } else { inThink = false; rest = rest.slice(end + 8); }
-        } else {
-          const start = rest.indexOf("<think>");
-          if (start < 0) { out += rest; rest = ""; } else { out += rest.slice(0, start); inThink = true; rest = rest.slice(start + 7); }
-        }
-      }
+      const out = filter.push(piece);
       if (out) yield out;
     }
   }
+  const tail = filter.flush();
+  if (tail) yield tail;
 }
