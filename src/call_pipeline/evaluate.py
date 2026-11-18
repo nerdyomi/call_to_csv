@@ -23,7 +23,6 @@ from pathlib import Path
 from .normalize import parse_number
 from .schema import Schema
 
-UNIT_FACTOR_FIELDS = ("yield",)  # model reports kg, hand-filled sheet may hold maund (x40)
 
 
 def phone_key(text: str) -> str:
@@ -77,10 +76,6 @@ def compare(pred_rows: list[dict], truth: dict[str, dict], schema: Schema,
                 continue
             status = "match" if tv == pv else "mismatch" if tv and pv else "missed" if tv else "extra"
             note = ""
-            if status == "mismatch" and f.name.endswith(UNIT_FACTOR_FIELDS):
-                a, b = parse_number(tv), parse_number(pv)
-                if a and b and float(b) == float(a) * 40:
-                    note = "x40 (sheet likely in maund, model in kg)"
             ev = evidence.get((pred.get("_stem", ""), f.name), {})
             cells.append({"recording": rec, "stem": pred.get("_stem", ""), "field": f.name, "type": f.type,
                           "truth": t[f.name], "pred": pred.get(f.name, ""), "status": status, "note": note,
@@ -145,11 +140,6 @@ def summarize(cells: list[dict], n_calls: int) -> str:
         lines.append(f"| {f} | {s['match']} | {s['mismatch']} | {s['missed']} | {s['extra']} |")
     lines.append("")
 
-    x40 = [c for c in cells if c["note"]]
-    if x40:
-        lines += [f"## Unit note: {len(x40)} yield cells differ exactly by x40", "",
-                  "These are cases where the hand-filled number looks like maund while the pipeline reports kg "
-                  "(1 maund = 40 kg). They are counted as mismatches above.", ""]
     return "\n".join(lines)
 
 

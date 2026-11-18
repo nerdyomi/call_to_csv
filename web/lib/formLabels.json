@@ -1,0 +1,2242 @@
+{
+ "formVersion": "65",
+ "fields": {
+  "project_sub_type": {
+   "order": 27,
+   "label": "কি কাজের জন্য লোন আবেদন করেছেন?",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "Crop-6",
+     "শস্য"
+    ],
+    [
+     "Livestock",
+     "গবাদি পশু"
+    ],
+    [
+     "Vegetable-7",
+     "শাকসবজি"
+    ],
+    [
+     "Fish-5",
+     "মাছ"
+    ],
+    [
+     "Fruit-8",
+     "ফল"
+    ],
+    [
+     "Agri-machinery-9",
+     "কৃষি যন্ত্রপাতি"
+    ],
+    [
+     "Others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "item_name_crops": {
+   "order": 28,
+   "label": "প্রকল্পের নাম:",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "Paddy",
+     "ধান"
+    ],
+    [
+     "Jute",
+     "পাট"
+    ],
+    [
+     "Chilli",
+     "মরিচ"
+    ],
+    [
+     "Wheat",
+     "গম"
+    ],
+    [
+     "Maize/Corn",
+     "ভুট্টা"
+    ],
+    [
+     "Potato",
+     "আলু"
+    ],
+    [
+     "Lentil",
+     "মসুর"
+    ],
+    [
+     "Soya Bean",
+     "সয়াবিন"
+    ],
+    [
+     "Onion",
+     "পেঁয়াজ"
+    ],
+    [
+     "Garlic",
+     "রসুন"
+    ],
+    [
+     "Flower",
+     "ফুল"
+    ],
+    [
+     "Turmeric",
+     "হলুদ"
+    ],
+    [
+     "Nut",
+     "বাদাম"
+    ],
+    [
+     "Betel Leaf",
+     "পান পাতা"
+    ],
+    [
+     "মসুর ডাল",
+     "মসুর ডাল"
+    ],
+    [
+     "Mustard",
+     "সর্ষে"
+    ],
+    [
+     "Ginger",
+     "আদা"
+    ],
+    [
+     "Other",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "item_name_livestock": {
+   "order": 29,
+   "label": "প্রকল্পের নাম:",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "Cow",
+     "গরু"
+    ],
+    [
+     "Goat",
+     "ছাগল"
+    ]
+   ]
+  },
+  "item_name_vegetable": {
+   "order": 30,
+   "label": "প্রকল্পের নাম:",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "Luffa",
+     "ঝিঙা"
+    ],
+    [
+     "Malabar Spinach",
+     "পুঁইশাক"
+    ],
+    [
+     "Spiny Gourd",
+     "কাঁকরোল"
+    ],
+    [
+     "Cauliflower",
+     "ফুলকপি"
+    ],
+    [
+     "Bottle Gourd",
+     "লাউ"
+    ],
+    [
+     "Yardlong Bean",
+     "বরবটি"
+    ],
+    [
+     "Cabbage",
+     "বাঁধাকপি"
+    ],
+    [
+     "Sponge Gourd",
+     "ধুঁধুল"
+    ],
+    [
+     "Brinjal",
+     "বেগুন"
+    ],
+    [
+     "Beetroot",
+     "বিট"
+    ],
+    [
+     "Taro",
+     "কচু"
+    ],
+    [
+     "Okra",
+     "ঢেঁড়স"
+    ],
+    [
+     "Cucumber",
+     "শসা"
+    ],
+    [
+     "Pumpkin",
+     "মিষ্টি কুমড়া"
+    ],
+    [
+     "Other",
+     "অন্যান্য"
+    ],
+    [
+     "Arum-Lobe",
+     "কচুর লতি"
+    ],
+    [
+     "Pointed Gourd",
+     "পটল"
+    ],
+    [
+     "Bitter Gourd",
+     "করলা"
+    ],
+    [
+     "Tomato",
+     "টমেটো"
+    ],
+    [
+     "Hyacinth Bean",
+     "শিম"
+    ],
+    [
+     "Green Amaranth",
+     "সবুজ শাক"
+    ]
+   ]
+  },
+  "item_name_fish": {
+   "order": 31,
+   "label": "প্রকল্পের নাম:",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "Shrimp",
+     "চিংড়ি"
+    ],
+    [
+     "Telapia",
+     "তেলাপিয়া"
+    ],
+    [
+     "Mrigal Carp",
+     "মৃগেল মাছ"
+    ],
+    [
+     "Carp",
+     "কার্প জাতীয় মাছ"
+    ],
+    [
+     "Catfish",
+     "ক্যাটফিশ (শিং/মাগুর জাতীয়)"
+    ],
+    [
+     "Pangas",
+     "পাঙ্গাস"
+    ],
+    [
+     "Rui",
+     "রুই মাছ"
+    ],
+    [
+     "Katla Fish",
+     "কাতলা মাছ"
+    ],
+    [
+     "Other",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "item_name_fruits": {
+   "order": 32,
+   "label": "প্রকল্পের নাম:",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "Watermelon",
+     "তরমুজ"
+    ],
+    [
+     "Mango",
+     "আম"
+    ],
+    [
+     "Banana",
+     "কলা"
+    ],
+    [
+     "Lychee",
+     "লিচু"
+    ],
+    [
+     "Dragon Fruit",
+     "ড্রাগন ফল"
+    ],
+    [
+     "Guava",
+     "পেয়ারা"
+    ],
+    [
+     "Other",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "item_name_others": {
+   "order": 33,
+   "label": "অন্যান্য প্রকল্পের নাম:",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "treatment",
+     "চিকিৎসা"
+    ],
+    [
+     "business",
+     "ব্যবসা"
+    ],
+    [
+     "house_construction",
+     "বাড়ি নির্মাণ"
+    ],
+    [
+     "child_marriage",
+     "সন্তানের বিয়ে"
+    ],
+    [
+     "personal",
+     "ব্যক্তিগত"
+    ],
+    [
+     "child_employment_purpose",
+     "সন্তানের চাকুরীর জন্য টাকা প্রদান"
+    ],
+    [
+     "child_abroad_purpose",
+     "সন্তানের বিদেশ গমন"
+    ],
+    [
+     "lease_mortgage_buy",
+     "জমি লিজ/পত্তন/কিনবেন"
+    ],
+    [
+     "bribe",
+     "ঘুষ/উৎকোচ প্রদান"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "others_purpose": {
+   "order": 34,
+   "label": "অন্যান্য কোন কারণে লোন নিবেন?",
+   "section": "Loan Purpose",
+   "type": "text",
+   "options": []
+  },
+  "agri_activity": {
+   "order": 35,
+   "label": "আপনি কি কৃষি কাজ করেন?",
+   "section": "Loan Purpose",
+   "type": "enum",
+   "options": [
+    [
+     "yes",
+     "হ্যাঁ"
+    ],
+    [
+     "no",
+     "না"
+    ]
+   ]
+  },
+  "farmland": {
+   "order": 36,
+   "label": "কৃষকের কৃষি জমির পরিমাণ:",
+   "section": "Household Assets",
+   "type": "enum",
+   "options": [
+    [
+     "decimal",
+     "শতক"
+    ],
+    [
+     "bigha",
+     "বিঘা"
+    ],
+    [
+     "katha",
+     "কাঠা"
+    ],
+    [
+     "acre",
+     "একর"
+    ],
+    [
+     "don",
+     "দোন"
+    ],
+    [
+     "kani",
+     "কানী"
+    ],
+    [
+     "kora",
+     "কড়া"
+    ],
+    [
+     "gonda",
+     "গন্ডা"
+    ]
+   ]
+  },
+  "decimals_per_bigha": {
+   "order": 37,
+   "label": "কত শতকে এক বিঘা?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimals_per_katha": {
+   "order": 38,
+   "label": "কত শতকে এক কাঠা?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimals_per_acre": {
+   "order": 39,
+   "label": "কত শতকে এক একর?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimals_per_don": {
+   "order": 40,
+   "label": "কত শতকে এক দোন?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimals_per_kani": {
+   "order": 41,
+   "label": "কত শতকে এক কানী?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimals_per_kora": {
+   "order": 42,
+   "label": "কত শতকে এক কড়া?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimals_per_gonda": {
+   "order": 43,
+   "label": "কত শতকে এক গন্ডা?",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "ownership": {
+   "order": 44,
+   "label": "কৃষি জমির মালিকানা?",
+   "section": "Household Assets",
+   "type": "multi",
+   "options": [
+    [
+     "own",
+     "নিজের মালিকানাধীন"
+    ],
+    [
+     "lease_mortgage",
+     "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক"
+    ]
+   ]
+  },
+  "katha_own": {
+   "order": 45,
+   "label": "নিজের মালিকানাধীন কত কাঠা:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "katha_lease_mortgage": {
+   "order": 46,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত কাঠা:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "bigha_own": {
+   "order": 47,
+   "label": "নিজের মালিকানাধীন কত বিঘা:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "bigha_lease_mortgage": {
+   "order": 48,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত বিঘা:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "acre_own": {
+   "order": 49,
+   "label": "নিজের মালিকানাধীন কত একর:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "acre_lease_mortgage": {
+   "order": 50,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত একর:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "kora_own": {
+   "order": 51,
+   "label": "নিজের মালিকানাধীন কত কড়া:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "kora_lease_mortgage": {
+   "order": 52,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত কড়া:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "don_own": {
+   "order": 53,
+   "label": "নিজের মালিকানাধীন কত দোন:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "don_lease_mortgage": {
+   "order": 54,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত দোন:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "kani_own": {
+   "order": 55,
+   "label": "নিজের মালিকানাধীন কত কানী:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "kani_lease_mortgage": {
+   "order": 56,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত কানী:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "gonda_own": {
+   "order": 57,
+   "label": "নিজের মালিকানাধীন কত গন্ডা:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "gonda_lease_mortgage": {
+   "order": 58,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত গন্ডা:",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimal_own": {
+   "order": 59,
+   "label": "নিজের মালিকানাধীন কত শতক :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "decimal_lease_mortgage": {
+   "order": 60,
+   "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত শতক :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "household_farm_assets": {
+   "order": 61,
+   "label": "কৃষকের কী কী গবাদি পশুপাখি আছে?",
+   "section": "Household Assets",
+   "type": "multi",
+   "options": [
+    [
+     "cow",
+     "গরু"
+    ],
+    [
+     "goat",
+     "ছাগল"
+    ],
+    [
+     "sheep",
+     "ভেড়া"
+    ],
+    [
+     "duck",
+     "হাঁস"
+    ],
+    [
+     "chicken",
+     "মুরগি"
+    ],
+    [
+     "horse",
+     "ঘোড়া"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "number_of_cows": {
+   "order": 62,
+   "label": "গরু কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "number_of_goats": {
+   "order": 63,
+   "label": "ছাগল কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "number_of_sheep": {
+   "order": 64,
+   "label": "ভেড়া কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "number_of_ducks": {
+   "order": 65,
+   "label": "হাঁস কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "number_of_chicken": {
+   "order": 66,
+   "label": "মুরগি কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "number_of_horses": {
+   "order": 67,
+   "label": "ঘোড়া কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "number_of_other_farm_assets": {
+   "order": 68,
+   "label": "অন্যান্য পশুপাখি কয়টি :",
+   "section": "Household Assets",
+   "type": "number",
+   "options": []
+  },
+  "other_farm_asset_names": {
+   "order": 69,
+   "label": "অন্যান্য পশুপাখির নাম :",
+   "section": "Household Assets",
+   "type": "text",
+   "options": []
+  },
+  "smartphone_ownership": {
+   "order": 70,
+   "label": "কৃষকের বা পরিবারের কারো স্মার্টফোন/টাচফোন আছে?",
+   "section": "Household Assets",
+   "type": "enum",
+   "options": [
+    [
+     "own",
+     "নিজের"
+    ],
+    [
+     "family_member",
+     "পরিবারের অন্যকারো"
+    ],
+    [
+     "both",
+     "উভয়ের"
+    ],
+    [
+     "none",
+     "নেই"
+    ]
+   ]
+  },
+  "agri_machineries": {
+   "order": 71,
+   "label": "কৃষকের নিম্নলিখিত কোন কোন কৃষি যন্ত্রপাতি আছে চিহ্নিত করুন?",
+   "section": "Household Assets",
+   "type": "multi",
+   "options": [
+    [
+     "tiller",
+     "পাওয়ার টিলার"
+    ],
+    [
+     "shallow_machine",
+     "স্যালো মেশিন"
+    ],
+    [
+     "spray",
+     "স্প্রে মেশিন"
+    ],
+    [
+     "threshing_machine",
+     "মাড়াই মেশিন"
+    ],
+    [
+     "irrigation_pump",
+     "সেঁচ পাম্প"
+    ],
+    [
+     "chopper_machine",
+     "খড়কাটা মেশিন"
+    ],
+    [
+     "none",
+     "নেই"
+    ]
+   ]
+  },
+  "current_landsize": {
+   "order": 72,
+   "label": "আপনি কতটুকু জমিতে  চাষ করতে চান?(শতক)",
+   "section": "Crop Details",
+   "type": "number",
+   "options": []
+  },
+  "paddy_variety": {
+   "order": 73,
+   "label": "আপনি কোন জাতের ধান চাষ করতে চান?",
+   "section": "Crop Details",
+   "type": "enum",
+   "options": [
+    [
+     "br17",
+     "বি আর ১৭"
+    ],
+    [
+     "br49",
+     "বি আর ৪৯"
+    ],
+    [
+     "br75",
+     "বি আর ৭৫"
+    ],
+    [
+     "br90",
+     "বি আর ৯০"
+    ],
+    [
+     "swarna05",
+     "স্বর্ণা ৫"
+    ],
+    [
+     "guti_swarna",
+     "গুটি স্বর্ণা"
+    ],
+    [
+     "chinigura",
+     "চিনিগুঁড়া (ব্রি ৩৪)"
+    ],
+    [
+     "sonamukhi",
+     "সোনামুখী কাটারি"
+    ],
+    [
+     "shampa",
+     "শম্পা কাটারি"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "paddy_variety_others": {
+   "order": 74,
+   "label": "অন্য জাতের নাম?",
+   "section": "Crop Details",
+   "type": "text",
+   "options": []
+  },
+  "previous_year_landsize": {
+   "order": 75,
+   "label": "গত বছর কতটুকু জমিতে  চাষ করেছিলেন? (শতক):",
+   "section": "Crop Details",
+   "type": "number",
+   "options": []
+  },
+  "previous_paddy_variety": {
+   "order": 76,
+   "label": "গত বছর কোন জাতের ধান চাষ করেছিলেন?",
+   "section": "Crop Details",
+   "type": "enum",
+   "options": [
+    [
+     "br17",
+     "বি আর ১৭"
+    ],
+    [
+     "br49",
+     "বি আর ৪৯"
+    ],
+    [
+     "br75",
+     "বি আর ৭৫"
+    ],
+    [
+     "br90",
+     "বি আর ৯০"
+    ],
+    [
+     "swarna05",
+     "স্বর্ণা ৫"
+    ],
+    [
+     "guti_swarna",
+     "গুটি স্বর্ণা"
+    ],
+    [
+     "chinigura",
+     "চিনিগুঁড়া (ব্রি ৩৪)"
+    ],
+    [
+     "sonamukhi",
+     "সোনামুখী কাটারি"
+    ],
+    [
+     "shampa",
+     "শম্পা কাটারি"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "previous_paddy_variety_others": {
+   "order": 77,
+   "label": "অন্য জাতের নাম?",
+   "section": "Crop Details",
+   "type": "text",
+   "options": []
+  },
+  "invest": {
+   "order": 78,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Crop Details",
+   "type": "number",
+   "options": []
+  },
+  "yield": {
+   "order": 79,
+   "label": "আপনার ফলন কতটুকু হয়েছিল? (কত মণ):",
+   "section": "Crop Details",
+   "type": "number",
+   "options": []
+  },
+  "unit_price": {
+   "order": 80,
+   "label": "প্রতি মণের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Crop Details",
+   "type": "number",
+   "options": []
+  },
+  "loan_amount": {
+   "order": 81,
+   "label": "আপনি কত টাকা লোন নিতে চান?",
+   "section": "Crop Details",
+   "type": "number",
+   "options": []
+  },
+  "cow_purpose": {
+   "order": 82,
+   "label": "আপনার গরু পালনের উদ্দেশ্য কি?",
+   "section": "Livestock",
+   "type": "multi",
+   "options": [
+    [
+     "meat",
+     "মাংস/মোটাতাজাকরণ"
+    ],
+    [
+     "milk",
+     "দুধ উৎপাদন"
+    ],
+    [
+     "breeding",
+     "প্রজনন"
+    ],
+    [
+     "purchase_food",
+     "গরুর খাদ্য/ফিড ক্রয়"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "cow_breed": {
+   "order": 83,
+   "label": "আপনি কোন জাতের গরু পালন করবেন?",
+   "section": "Livestock",
+   "type": "enum",
+   "options": [
+    [
+     "local",
+     "দেশী/লোকাল"
+    ],
+    [
+     "shahiwal",
+     "শাহীওয়াল"
+    ],
+    [
+     "friesian",
+     "ফ্রিজিয়ান"
+    ],
+    [
+     "jersey",
+     "জার্সি"
+    ],
+    [
+     "cross",
+     "ক্রস"
+    ],
+    [
+     "pabna_variety",
+     "পাবনা জাত"
+    ],
+    [
+     "rcc",
+     "রেড চিটাগাং (আর.সি.সি)"
+    ],
+    [
+     "red_shindhi",
+     "লাল সিন্ধি গরু"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "cowshed_material": {
+   "order": 84,
+   "label": "গোয়ালঘরের কাঠামো কিসের তৈরি ?",
+   "section": "Livestock",
+   "type": "enum",
+   "options": [
+    [
+     "paka",
+     "পাকা"
+    ],
+    [
+     "semi_paka",
+     "আধা-পাকা"
+    ],
+    [
+     "tin",
+     "টিন"
+    ],
+    [
+     "kacha_bamboo_wood",
+     "কাঁচা (বাঁশ/কাঠ)"
+    ],
+    [
+     "mud",
+     "মাটি"
+    ]
+   ]
+  },
+  "cowshed_facility": {
+   "order": 85,
+   "label": "আপনার গোয়ালঘরে নিম্নলিখিত কোন সুবিধাগুলো আছে ?",
+   "section": "Livestock",
+   "type": "multi",
+   "options": [
+    [
+     "matt",
+     "ম্যাট"
+    ],
+    [
+     "motor_pump",
+     "মোটর পাম্প"
+    ],
+    [
+     "fan",
+     "ফ্যান"
+    ],
+    [
+     "light",
+     "লাইট"
+    ],
+    [
+     "mosquito_net",
+     "মশারী"
+    ],
+    [
+     "coil",
+     "মশার কয়েল/স্প্রে"
+    ]
+   ]
+  },
+  "cowshed_capacity": {
+   "order": 86,
+   "label": "আপনার গোয়ালঘরে কয়টি গরু রাখার জায়গা আছে ?",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "cow_transactional_data": {
+   "order": 87,
+   "label": "নিম্নলিখিত কয়টি বিক্রয়কৃত গরু পালনের আয় ব্যয়ের তথ্য দিতে পারবেন?",
+   "section": "Livestock",
+   "type": "enum",
+   "options": [
+    [
+     "1",
+     "১ টি গরু"
+    ],
+    [
+     "2",
+     "২ টি গরু"
+    ],
+    [
+     "0",
+     "গত ৩ বছরে কোনো গরু বিক্রয় করিনি"
+    ]
+   ]
+  },
+  "if_1_breed": {
+   "order": 88,
+   "label": "গরুটি কোন জাতের?",
+   "section": "Livestock",
+   "type": "enum",
+   "options": [
+    [
+     "local",
+     "দেশী/লোকাল"
+    ],
+    [
+     "shahiwal",
+     "শাহীওয়াল"
+    ],
+    [
+     "friesian",
+     "ফ্রিজিয়ান"
+    ],
+    [
+     "jersey",
+     "জার্সি"
+    ],
+    [
+     "cross",
+     "ক্রস"
+    ],
+    [
+     "pabna_variety",
+     "পাবনা জাত"
+    ],
+    [
+     "rcc",
+     "রেড চিটাগাং (আর.সি.সি)"
+    ],
+    [
+     "red_shindhi",
+     "লাল সিন্ধি গরু"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "if_1_purchase_price": {
+   "order": 89,
+   "label": "গরুটির ক্রয়মূল্য",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_1_duration": {
+   "order": 90,
+   "label": "গরুটি কতদিন পালন করেছেন (কয় মাস)?",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_1_rearing_cost": {
+   "order": 91,
+   "label": "গরু পালনে মোট খরচ:",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_1_sell": {
+   "order": 92,
+   "label": "গরুটির বিক্রয়মূল্য:",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_2_breed": {
+   "order": 93,
+   "label": "২য় গরুটি কোন জাতের?",
+   "section": "Livestock",
+   "type": "enum",
+   "options": [
+    [
+     "local",
+     "দেশী/লোকাল"
+    ],
+    [
+     "shahiwal",
+     "শাহীওয়াল"
+    ],
+    [
+     "friesian",
+     "ফ্রিজিয়ান"
+    ],
+    [
+     "jersey",
+     "জার্সি"
+    ],
+    [
+     "cross",
+     "ক্রস"
+    ],
+    [
+     "pabna_variety",
+     "পাবনা জাত"
+    ],
+    [
+     "rcc",
+     "রেড চিটাগাং (আর.সি.সি)"
+    ],
+    [
+     "red_shindhi",
+     "লাল সিন্ধি গরু"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "if_2_purchase_price": {
+   "order": 94,
+   "label": "২য় গরুটির ক্রয়মূল্য",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_2_duration": {
+   "order": 95,
+   "label": "২য় গরুটি কতদিন পালন করেছেন (কয় মাস)?",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_2_rearing_cost": {
+   "order": 96,
+   "label": "২য় গরু পালনে মোট খরচ:",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "if_2_sell": {
+   "order": 97,
+   "label": "২য় গরুটির বিক্রয়মূল্য:",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "number_of_selling_goats": {
+   "order": 98,
+   "label": "গত এক বছরে মোট কয়টি ছাগল বিক্রয় করেছেন?",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "selling_price": {
+   "order": 99,
+   "label": "সর্বমোট বিক্রয়মূল্যের পরিমাণ?",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "purchase_and_rearing_cost": {
+   "order": 100,
+   "label": "বিক্রয়কৃত ছাগলের ক্রয়মূল্য ও পালনের সর্বমোট খরচ?",
+   "section": "Livestock",
+   "type": "number",
+   "options": []
+  },
+  "other_farming_activity": {
+   "order": 101,
+   "label": "আপনি আর কোন কোন ফসল ও ফল চাষ করেন?",
+   "section": "Other Farming Activity",
+   "type": "multi",
+   "options": [
+    [
+     "maize",
+     "ভুট্টা"
+    ],
+    [
+     "potato",
+     "আলু"
+    ],
+    [
+     "paddy",
+     "ধান"
+    ],
+    [
+     "onion",
+     "পেঁয়াজ"
+    ],
+    [
+     "chili",
+     "মরিচ"
+    ],
+    [
+     "mustard",
+     "সরিষা"
+    ],
+    [
+     "vegetable",
+     "সবজি"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ],
+    [
+     "none",
+     "নেই"
+    ]
+   ]
+  },
+  "maize_land_size": {
+   "order": 102,
+   "label": "আপনি কতটুকু জমিতে ভুট্টা চাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "maize_invest": {
+   "order": 103,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "maize_yield": {
+   "order": 104,
+   "label": "আপনার ফলন কতটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "maize_unit_price": {
+   "order": 105,
+   "label": "প্রতি মণ ভুট্টার বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "potato_land_size": {
+   "order": 106,
+   "label": "আপনি কতটুকু জমিতে আলু চাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "potato_invest": {
+   "order": 107,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "potato_yield": {
+   "order": 108,
+   "label": "আপনার ফলন কতটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "potato_unit_price": {
+   "order": 109,
+   "label": "প্রতি মণ আলুর বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "paddy_land_size": {
+   "order": 110,
+   "label": "আপনি কতটুকু জমিতে ধান চাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "ofa_paddy_variety": {
+   "order": 111,
+   "label": "কোন জাতের ধান চাষ করেছিলেন",
+   "section": "Other Farming Activity",
+   "type": "enum",
+   "options": [
+    [
+     "br17",
+     "বি আর ১৭"
+    ],
+    [
+     "br49",
+     "বি আর ৪৯"
+    ],
+    [
+     "br75",
+     "বি আর ৭৫"
+    ],
+    [
+     "br90",
+     "বি আর ৯০"
+    ],
+    [
+     "swarna05",
+     "স্বর্ণা ৫"
+    ],
+    [
+     "guti_swarna",
+     "গুটি স্বর্ণা"
+    ],
+    [
+     "chinigura",
+     "চিনিগুঁড়া (ব্রি ৩৪)"
+    ],
+    [
+     "sonamukhi",
+     "সোনামুখী কাটারি"
+    ],
+    [
+     "shampa",
+     "শম্পা কাটারি"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "ofa_paddy_variety_others": {
+   "order": 112,
+   "label": "অন্য জাতের নাম?",
+   "section": "Other Farming Activity",
+   "type": "text",
+   "options": []
+  },
+  "paddy_invest": {
+   "order": 113,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "paddy_yield": {
+   "order": 114,
+   "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "paddy_unit_price": {
+   "order": 115,
+   "label": "প্রতি মণ ধানের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "onion_land_size": {
+   "order": 116,
+   "label": "আপনি কতটুকু জমিতে পেঁয়াজ চাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "onion_invest": {
+   "order": 117,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "onion_yield": {
+   "order": 118,
+   "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "onion_unit_price": {
+   "order": 119,
+   "label": "প্রতি মণ পেঁয়াজের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "chili_land_size": {
+   "order": 120,
+   "label": "আপনি কতটুকু জমিতে মরিচচাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "chili_invest": {
+   "order": 121,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "chili_yield": {
+   "order": 122,
+   "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "chili_unit_price": {
+   "order": 123,
+   "label": "প্রতি মণ মরিচের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "mustard_land_size": {
+   "order": 124,
+   "label": "আপনি কতটুকু জমিতে সরিষাচাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "mustard_invest": {
+   "order": 125,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "mustard_yield": {
+   "order": 126,
+   "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "mustard_unit_price": {
+   "order": 127,
+   "label": "প্রতি মণ সরিষা বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "vegetable_name": {
+   "order": 128,
+   "label": "আপনি কোন সবজী চাষ করেছিলেন?",
+   "section": "Other Farming Activity",
+   "type": "text",
+   "options": []
+  },
+  "vegetable_land_size": {
+   "order": 129,
+   "label": "আপনি কতটুকু জমিতে সবজী চাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "vegetable_invest": {
+   "order": 130,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "vegetable_yield": {
+   "order": 131,
+   "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "vegetable_unit_price": {
+   "order": 132,
+   "label": "প্রতি মণ সবজীর বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "others_farming": {
+   "order": 133,
+   "label": "অন্নান্য কৃষিকাজ কী কী ?",
+   "section": "Other Farming Activity",
+   "type": "text",
+   "options": []
+  },
+  "others_land_size": {
+   "order": 134,
+   "label": "আপনি কতটুকু জমিতে চাষ করেছিলেন? (শতক):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "others_invest": {
+   "order": 135,
+   "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল?",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "others_yield": {
+   "order": 136,
+   "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "others_unit_price": {
+   "order": 137,
+   "label": "প্রতি মণের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+   "section": "Other Farming Activity",
+   "type": "number",
+   "options": []
+  },
+  "other_farming_activities_livestock": {
+   "order": 138,
+   "label": "আপনি আর কোন কোন গবাদী পশু পাখি পালন করেন?",
+   "section": "Other Farming Activity Livestock",
+   "type": "multi",
+   "options": [
+    [
+     "cow",
+     "গরু"
+    ],
+    [
+     "goat",
+     "ছাগল"
+    ],
+    [
+     "poultry",
+     "পোল্ট্রি/মুরগি"
+    ],
+    [
+     "duck",
+     "হাঁস"
+    ],
+    [
+     "fisheries",
+     "মৎস্যচাষ"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ],
+    [
+     "none",
+     "নেই"
+    ]
+   ]
+  },
+  "sold_cows_number": {
+   "order": 139,
+   "label": "গত এক বছরে কয়টি গরু বিক্রি করেছেন?",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "sold_cows_profit": {
+   "order": 140,
+   "label": "সর্বমোট কত টাকা লাভ হয়েছিল?",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "sold_goats_number": {
+   "order": 141,
+   "label": "গত এক বছরে কয়টি ছাগল বিক্রি করেছেন?",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "sold_goat_profit": {
+   "order": 142,
+   "label": "সর্বমোট কত টাকা লাভ হয়েছিল?",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "duck_invest": {
+   "order": 143,
+   "label": "গত এক বছরে হাঁস পালনে সর্বমোট খরচ বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "duck_sell": {
+   "order": 144,
+   "label": "গত এক বছরে পালন করা সব হাঁসের  বিক্রয়মূল্য বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "poultry_invest": {
+   "order": 145,
+   "label": "গত এক বছরে পোল্ট্রি/মুরগি পালনে সর্বমোট খরচ বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "poultry_sell": {
+   "order": 146,
+   "label": "গত এক বছরে পোল্ট্রি/মুরগি পালনে বিক্রয়মূল্য বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "fisheries_invest": {
+   "order": 147,
+   "label": "গত এক বছরে মাছচাষে সর্বমোট খরচ বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "fisheries_sell": {
+   "order": 148,
+   "label": "গত এক বছরে মাছচাষের বিক্রয়মূল্য বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "others_livestock": {
+   "order": 149,
+   "label": "অন্যান্য গবাদী পশু পাখির নাম:",
+   "section": "Other Farming Activity Livestock",
+   "type": "text",
+   "options": []
+  },
+  "others_livestock_invest": {
+   "order": 150,
+   "label": "গত এক বছরে এই গবাদী পশু পাখি পালনে সর্বমোট খরচ বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "others_livestock_sell": {
+   "order": 151,
+   "label": "গত এক বছরে এই গবাদী পশু পাখির বিক্রয়মূল্য বাৎসরিক:",
+   "section": "Other Farming Activity Livestock",
+   "type": "number",
+   "options": []
+  },
+  "current_loan_count": {
+   "order": 152,
+   "label": "কৃষকের নিজের রানিং/চলমান লোন কয়টি?",
+   "section": "Loan Details",
+   "type": "enum",
+   "options": [
+    [
+     "1",
+     "১"
+    ],
+    [
+     "2",
+     "২"
+    ],
+    [
+     "3",
+     "৩"
+    ],
+    [
+     "0",
+     "কোন লোন নেই"
+    ]
+   ]
+  },
+  "current_loan_amount": {
+   "order": 153,
+   "label": "সর্বমোট ঋণের টাকার পরিমাণ ?",
+   "section": "Loan Details",
+   "type": "number",
+   "options": []
+  },
+  "current_loan_duration": {
+   "order": 154,
+   "label": "ঋণের মেয়াদ/সময়কাল (কত মাস) ?",
+   "section": "Loan Details",
+   "type": "number",
+   "options": []
+  },
+  "current_loan_repaid_amount": {
+   "order": 155,
+   "label": "লোণের কত টাকা পরিশোধ করেছেন?",
+   "section": "Loan Details",
+   "type": "number",
+   "options": []
+  },
+  "loan_access": {
+   "order": 156,
+   "label": "কোথা থেকে  লোন নিয়েছেন?",
+   "section": "Loan Details",
+   "type": "enum",
+   "options": [
+    [
+     "bank",
+     "ব্যাংক"
+    ],
+    [
+     "mfi",
+     "এমএফআই/এন.জি.ও"
+    ],
+    [
+     "cooperative_society",
+     "সমবায় সমিতি"
+    ],
+    [
+     "money_lender",
+     "মহাজন"
+    ],
+    [
+     "dadon",
+     "দাদন ব্যবসায়ী"
+    ],
+    [
+     "none",
+     "কোনোটিই নয়"
+    ]
+   ]
+  },
+  "loan_reason": {
+   "order": 157,
+   "label": "নিম্নলিখিত কোন কারণে লোনটি নিয়েছেন :",
+   "section": "Loan Details",
+   "type": "enum",
+   "options": [
+    [
+     "livestock",
+     "গবাদি পশুপালন (গরু/ছাগল/ভেড়া)"
+    ],
+    [
+     "crop",
+     "শস্য চাষ"
+    ],
+    [
+     "duck_poultry",
+     "পোলট্রি (হাঁস/মুরগী)"
+    ],
+    [
+     "agri_machineries",
+     "কৃষি যন্ত্রপাতি (মেশিনারিজ)"
+    ],
+    [
+     "fisheries",
+     "মাছচাষ"
+    ],
+    [
+     "fruits_garden",
+     "ফলের বাগান"
+    ],
+    [
+     "treatment",
+     "চিকিৎসা"
+    ],
+    [
+     "business",
+     "ব্যবসা"
+    ],
+    [
+     "house_construction",
+     "বাড়ি নির্মাণ"
+    ],
+    [
+     "child_marriage",
+     "সন্তানের বিয়ে"
+    ],
+    [
+     "personal",
+     "ব্যক্তিগত"
+    ],
+    [
+     "child_employment_purpose",
+     "সন্তানের চাকুরীর জন্য টাকা প্রদান"
+    ],
+    [
+     "child_abroad_purpose",
+     "সন্তানের বিদেশ গমন"
+    ],
+    [
+     "lease_mortgage_buy",
+     "জমি লিজ/পত্তন/কিনেছেন"
+    ],
+    [
+     "bribe",
+     "ঘুষ/উৎকোচ প্রদান"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "current_spouse_loan_count": {
+   "order": 158,
+   "label": "কৃষকের স্বামী/স্ত্রীর রানিং/চলমান লোন কয়টি?",
+   "section": "Loan Details",
+   "type": "enum",
+   "options": [
+    [
+     "1",
+     "১"
+    ],
+    [
+     "2",
+     "২"
+    ],
+    [
+     "3",
+     "৩"
+    ],
+    [
+     "0",
+     "কোন লোন নেই"
+    ]
+   ]
+  },
+  "current_spouse_loan_amount": {
+   "order": 159,
+   "label": "সর্বমোট ঋণের টাকার পরিমাণ ?",
+   "section": "Loan Details",
+   "type": "number",
+   "options": []
+  },
+  "current_spouse_loan_duration": {
+   "order": 160,
+   "label": "ঋণের মেয়াদ/সময়কাল (কত মাস) ?",
+   "section": "Loan Details",
+   "type": "number",
+   "options": []
+  },
+  "spouse_loan_repaid_amount": {
+   "order": 161,
+   "label": "লোণের কত টাকা পরিশোধ করেছেন?",
+   "section": "Loan Details",
+   "type": "number",
+   "options": []
+  },
+  "spouse_loan_access": {
+   "order": 162,
+   "label": "কোথা থেকে লোন নিয়েছেন?",
+   "section": "Loan Details",
+   "type": "enum",
+   "options": [
+    [
+     "bank",
+     "ব্যাংক"
+    ],
+    [
+     "mfi",
+     "এমএফআই/এন.জি.ও"
+    ],
+    [
+     "cooperative_society",
+     "সমবায় সমিতি"
+    ],
+    [
+     "money_lender",
+     "মহাজন"
+    ],
+    [
+     "dadon",
+     "দাদন ব্যবসায়ী"
+    ],
+    [
+     "none",
+     "কোনোটিই নয়"
+    ]
+   ]
+  },
+  "spouse_loan_reason": {
+   "order": 163,
+   "label": "নিম্নলিখিত কোন কারণে লোনটি নিয়েছেন :",
+   "section": "Loan Details",
+   "type": "enum",
+   "options": [
+    [
+     "livestock",
+     "গবাদি পশুপালন (গরু/ছাগল/ভেড়া)"
+    ],
+    [
+     "crop",
+     "শস্য চাষ"
+    ],
+    [
+     "duck_poultry",
+     "পোলট্রি (হাঁস/মুরগী)"
+    ],
+    [
+     "agri_machineries",
+     "কৃষি যন্ত্রপাতি (মেশিনারিজ)"
+    ],
+    [
+     "fisheries",
+     "মাছচাষ"
+    ],
+    [
+     "fruits_garden",
+     "ফলের বাগান"
+    ],
+    [
+     "treatment",
+     "চিকিৎসা"
+    ],
+    [
+     "business",
+     "ব্যবসা"
+    ],
+    [
+     "house_construction",
+     "বাড়ি নির্মাণ"
+    ],
+    [
+     "child_marriage",
+     "সন্তানের বিয়ে"
+    ],
+    [
+     "personal",
+     "ব্যক্তিগত"
+    ],
+    [
+     "child_employment_purpose",
+     "সন্তানের চাকুরীর জন্য টাকা প্রদান"
+    ],
+    [
+     "child_abroad_purpose",
+     "সন্তানের বিদেশ গমন"
+    ],
+    [
+     "lease_mortgage_buy",
+     "জমি লিজ/পত্তন/কিনেছেন"
+    ],
+    [
+     "bribe",
+     "ঘুষ/উৎকোচ প্রদান"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "vaccine_names": {
+   "order": 164,
+   "label": "নিম্নলিখিত কোন কোন টিকা দিয়েছেন?",
+   "section": "Cow management & health",
+   "type": "multi",
+   "options": [
+    [
+     "khurarog",
+     "ক্ষুরারোগ"
+    ],
+    [
+     "tarka",
+     "তড়কা"
+    ],
+    [
+     "badla",
+     "বাদলা"
+    ],
+    [
+     "golafola",
+     "গলাফুলা"
+    ],
+    [
+     "lumpy_skin_disease",
+     "লাম্পি স্কীন রোগ"
+    ],
+    [
+     "none",
+     "টিকা দেই না"
+    ]
+   ]
+  },
+  "deworming_frequency": {
+   "order": 165,
+   "label": "গরুকে বছরে কতবার কৃমিনাশক ওষুধ দেন?",
+   "section": "Cow management & health",
+   "type": "enum",
+   "options": [
+    [
+     "1",
+     "বছরে ১ বার"
+    ],
+    [
+     "2",
+     "বছরে ২ বার"
+    ],
+    [
+     "3",
+     "বছরে ৩ বার"
+    ],
+    [
+     "4",
+     "বছরে ৪ বার"
+    ],
+    [
+     "5",
+     "বছরে ৫ বার"
+    ],
+    [
+     "6",
+     "বছরে ৬ বার"
+    ],
+    [
+     "none",
+     "কোন কৃমিনাশক দেয়া হয়নি"
+    ]
+   ]
+  },
+  "number_of_dependents": {
+   "order": 166,
+   "label": "পরিবারের মোট সদস্য সংখ্যা ?",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "number_of_earning_members": {
+   "order": 167,
+   "label": "পরিবারের মোট  উপার্জনকারী  সদস্য সংখ্যা কতজন?",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "individual_income_sources": {
+   "order": 168,
+   "label": "কৃষিকাজ  ছাড়া কৃষকের বাকি আয়ের উৎসগুলো কি কি?",
+   "section": "Income & Expense",
+   "type": "multi",
+   "options": [
+    [
+     "business",
+     "ব্যবসা"
+    ],
+    [
+     "labor",
+     "শ্রম"
+    ],
+    [
+     "govt_job",
+     "সরকারি চাকরি"
+    ],
+    [
+     "private_job",
+     "বেসরকারি চাকরি"
+    ],
+    [
+     "driver",
+     "অটো/ভ্যান/বাস/ট্রাক/ অন্যান্য পরিবহন চালক"
+    ],
+    [
+     "stipend",
+     "ভাতা"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "income_from_business": {
+   "order": 169,
+   "label": "ব্যবসা হতে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "business_type": {
+   "order": 170,
+   "label": "কোন ধরণের ব্যবসা?",
+   "section": "Income & Expense",
+   "type": "enum",
+   "options": [
+    [
+     "cattle_fish_businees",
+     "গবাদী পশু ও মৎস্য ব্যবসায়ী"
+    ],
+    [
+     "shop",
+     "মুদি/ফল/সবজির দোকান"
+    ],
+    [
+     "foriya",
+     "কৃষি পণ্য ফড়িয়া/পাইকারি  কেনাবেচা"
+    ],
+    [
+     "input_seller",
+     "কৃষি উপকরণ (সার/বীজ/কীটনাশক) ও পশুখাদ্যের দোকান"
+    ],
+    [
+     "transport_business",
+     "পরিবহন ভাড়া থেকে আয় (অটো/ভ্যান//বাস/ট্রাক অন্যান্য)"
+    ],
+    [
+     "others",
+     "অন্যান্য"
+    ]
+   ]
+  },
+  "income_from_labor": {
+   "order": 171,
+   "label": "শ্রম হতে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "labor_job_details": {
+   "order": 172,
+   "label": "কোন ধরনের শ্রম বিস্তারিত জানান?",
+   "section": "Income & Expense",
+   "type": "text",
+   "options": []
+  },
+  "income_from_govt_job": {
+   "order": 173,
+   "label": "সরকারি চাকরি হতে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "govt_job_details": {
+   "order": 174,
+   "label": "কোন ধরনের চাকরি বিস্তারিত জানান?",
+   "section": "Income & Expense",
+   "type": "text",
+   "options": []
+  },
+  "income_from_private_job": {
+   "order": 175,
+   "label": "বেসরকারি চাকরি হতে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "private_job_details": {
+   "order": 176,
+   "label": "কোন ধরনের চাকরি বিস্তারিত জানান?",
+   "section": "Income & Expense",
+   "type": "text",
+   "options": []
+  },
+  "income_from_driving": {
+   "order": 177,
+   "label": "অটো/ভ্যান/বাস/ট্রাক/ অন্যান্য পরিবহন চালিয়ে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "income_from_stipend": {
+   "order": 178,
+   "label": "ভাতা হতে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "income_from_others": {
+   "order": 179,
+   "label": "অন্যান্য উৎস হতে আয়ের পরিমাণ (বাৎসরিক)",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "monthly_expenses": {
+   "order": 180,
+   "label": "কৃষকের মোট মাসিক ব্যয়ের পরিমান (খাদ্য, শিক্ষা, চিকিৎসা অন্যান্য সকল ব্যয়):",
+   "section": "Income & Expense",
+   "type": "number",
+   "options": []
+  },
+  "how_do_you_know_the_mf": {
+   "order": 181,
+   "label": "আমাদের মার্কেট ফ্যাসিলিটেটর/ফিল্ড অফিসার /এজেন্টকে  কিভাবে চেনেন  ও সম্পর্ক?",
+   "section": "MF Relation",
+   "type": "text",
+   "options": []
+  },
+  "calc_land_own_decimals": {
+   "order": 182,
+   "label": "Own land in decimals (calculated from the unit, amount and conversion)",
+   "section": "Calculated",
+   "type": "number",
+   "options": []
+  },
+  "calc_land_lease_decimals": {
+   "order": 183,
+   "label": "Leased / mortgaged land in decimals (calculated)",
+   "section": "Calculated",
+   "type": "number",
+   "options": []
+  },
+  "calc_land_total_decimals": {
+   "order": 184,
+   "label": "Total land in decimals (calculated)",
+   "section": "Calculated",
+   "type": "number",
+   "options": []
+  }
+ }
+}

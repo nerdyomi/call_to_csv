@@ -1,0 +1,3941 @@
+{
+  "form": {
+    "key": "kyc_verification",
+    "name": "KYC Verification",
+    "purpose": "interaction"
+  },
+  "version": {
+    "number": 65,
+    "status": "published",
+    "published_at": "2026-11-10T11:32:00+06:00"
+  },
+  "exported_at": "2026-11-16T15:57:42+06:00",
+  "schema": {
+    "sections": [
+      {
+        "title": "Loan Purpose",
+        "fields": [
+          {
+            "key": "loan_id",
+            "type": "string",
+            "label": "Loan Request ID",
+            "required": true
+          },
+          {
+            "key": "project_sub_type",
+            "type": "select",
+            "label": "কি কাজের জন্য লোন আবেদন করেছেন?",
+            "options": [
+              {
+                "code": "Crop-6",
+                "label": "শস্য"
+              },
+              {
+                "code": "Livestock",
+                "label": "গবাদি পশু"
+              },
+              {
+                "code": "Vegetable-7",
+                "label": "শাকসবজি"
+              },
+              {
+                "code": "Fish-5",
+                "label": "মাছ"
+              },
+              {
+                "code": "Fruit-8",
+                "label": "ফল"
+              },
+              {
+                "code": "Agri-machinery-9",
+                "label": "কৃষি যন্ত্রপাতি"
+              },
+              {
+                "code": "Others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": null
+          },
+          {
+            "key": "item_name_crops",
+            "type": "select",
+            "label": "প্রকল্পের নাম:",
+            "options": [
+              {
+                "code": "Paddy",
+                "label": "ধান"
+              },
+              {
+                "code": "Jute",
+                "label": "পাট"
+              },
+              {
+                "code": "Chilli",
+                "label": "মরিচ"
+              },
+              {
+                "code": "Wheat",
+                "label": "গম"
+              },
+              {
+                "code": "Maize/Corn",
+                "label": "ভুট্টা"
+              },
+              {
+                "code": "Potato",
+                "label": "আলু"
+              },
+              {
+                "code": "Lentil",
+                "label": "মসুর"
+              },
+              {
+                "code": "Soya Bean",
+                "label": "সয়াবিন"
+              },
+              {
+                "code": "Onion",
+                "label": "পেঁয়াজ"
+              },
+              {
+                "code": "Garlic",
+                "label": "রসুন"
+              },
+              {
+                "code": "Flower",
+                "label": "ফুল"
+              },
+              {
+                "code": "Turmeric",
+                "label": "হলুদ"
+              },
+              {
+                "code": "Nut",
+                "label": "বাদাম"
+              },
+              {
+                "code": "Betel Leaf",
+                "label": "পান পাতা"
+              },
+              {
+                "code": "মসুর ডাল",
+                "label": "মসুর ডাল"
+              },
+              {
+                "code": "Mustard",
+                "label": "সর্ষে"
+              },
+              {
+                "code": "Ginger",
+                "label": "আদা"
+              },
+              {
+                "code": "Other",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Crop-6",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "item_name_livestock",
+            "type": "select",
+            "label": "প্রকল্পের নাম:",
+            "options": [
+              {
+                "code": "Cow",
+                "label": "গরু"
+              },
+              {
+                "code": "Goat",
+                "label": "ছাগল"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "item_name_vegetable",
+            "type": "select",
+            "label": "প্রকল্পের নাম:",
+            "options": [
+              {
+                "code": "Luffa",
+                "label": "ঝিঙা"
+              },
+              {
+                "code": "Malabar Spinach",
+                "label": "পুঁইশাক"
+              },
+              {
+                "code": "Spiny Gourd",
+                "label": "কাঁকরোল"
+              },
+              {
+                "code": "Cauliflower",
+                "label": "ফুলকপি"
+              },
+              {
+                "code": "Bottle Gourd",
+                "label": "লাউ"
+              },
+              {
+                "code": "Yardlong Bean",
+                "label": "বরবটি"
+              },
+              {
+                "code": "Cabbage",
+                "label": "বাঁধাকপি"
+              },
+              {
+                "code": "Sponge Gourd",
+                "label": "ধুঁধুল"
+              },
+              {
+                "code": "Brinjal",
+                "label": "বেগুন"
+              },
+              {
+                "code": "Beetroot",
+                "label": "বিট"
+              },
+              {
+                "code": "Taro",
+                "label": "কচু"
+              },
+              {
+                "code": "Okra",
+                "label": "ঢেঁড়স"
+              },
+              {
+                "code": "Cucumber",
+                "label": "শসা"
+              },
+              {
+                "code": "Pumpkin",
+                "label": "মিষ্টি কুমড়া"
+              },
+              {
+                "code": "Other",
+                "label": "অন্যান্য"
+              },
+              {
+                "code": "Arum-Lobe",
+                "label": "কচুর লতি"
+              },
+              {
+                "code": "Pointed Gourd",
+                "label": "পটল"
+              },
+              {
+                "code": "Bitter Gourd",
+                "label": "করলা"
+              },
+              {
+                "code": "Tomato",
+                "label": "টমেটো"
+              },
+              {
+                "code": "Hyacinth Bean",
+                "label": "শিম"
+              },
+              {
+                "code": "Green Amaranth",
+                "label": "সবুজ শাক"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Vegetable-7",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "item_name_fish",
+            "type": "select",
+            "label": "প্রকল্পের নাম:",
+            "options": [
+              {
+                "code": "Shrimp",
+                "label": "চিংড়ি"
+              },
+              {
+                "code": "Telapia",
+                "label": "তেলাপিয়া"
+              },
+              {
+                "code": "Mrigal Carp",
+                "label": "মৃগেল মাছ"
+              },
+              {
+                "code": "Carp",
+                "label": "কার্প জাতীয় মাছ"
+              },
+              {
+                "code": "Catfish",
+                "label": "ক্যাটফিশ (শিং/মাগুর জাতীয়)"
+              },
+              {
+                "code": "Pangas",
+                "label": "পাঙ্গাস"
+              },
+              {
+                "code": "Rui",
+                "label": "রুই মাছ"
+              },
+              {
+                "code": "Katla Fish",
+                "label": "কাতলা মাছ"
+              },
+              {
+                "code": "Other",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Fish-5",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "item_name_fruits",
+            "type": "select",
+            "label": "প্রকল্পের নাম:",
+            "options": [
+              {
+                "code": "Watermelon",
+                "label": "তরমুজ"
+              },
+              {
+                "code": "Mango",
+                "label": "আম"
+              },
+              {
+                "code": "Banana",
+                "label": "কলা"
+              },
+              {
+                "code": "Lychee",
+                "label": "লিচু"
+              },
+              {
+                "code": "Dragon Fruit",
+                "label": "ড্রাগন ফল"
+              },
+              {
+                "code": "Guava",
+                "label": "পেয়ারা"
+              },
+              {
+                "code": "Other",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Fruit-8",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "item_name_others",
+            "type": "select",
+            "label": "অন্যান্য প্রকল্পের নাম:",
+            "options": [
+              {
+                "code": "treatment",
+                "label": "চিকিৎসা"
+              },
+              {
+                "code": "business",
+                "label": "ব্যবসা"
+              },
+              {
+                "code": "house_construction",
+                "label": "বাড়ি নির্মাণ"
+              },
+              {
+                "code": "child_marriage",
+                "label": "সন্তানের বিয়ে"
+              },
+              {
+                "code": "personal",
+                "label": "ব্যক্তিগত"
+              },
+              {
+                "code": "child_employment_purpose",
+                "label": "সন্তানের চাকুরীর জন্য টাকা প্রদান"
+              },
+              {
+                "code": "child_abroad_purpose",
+                "label": "সন্তানের বিদেশ গমন"
+              },
+              {
+                "code": "lease_mortgage_buy",
+                "label": "জমি লিজ/পত্তন/কিনবেন"
+              },
+              {
+                "code": "bribe",
+                "label": "ঘুষ/উৎকোচ প্রদান"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_purpose",
+            "type": "text",
+            "label": "অন্যান্য কোন কারণে লোন নিবেন?",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "item_name_others",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "agri_activity",
+            "type": "select",
+            "label": "আপনি কি কৃষি কাজ করেন?",
+            "options": [
+              {
+                "code": "yes",
+                "label": "হ্যাঁ"
+              },
+              {
+                "code": "no",
+                "label": "না"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Others",
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "Household Assets",
+        "fields": [
+          {
+            "key": "farmland",
+            "type": "select",
+            "label": "কৃষকের কৃষি জমির পরিমাণ:",
+            "options": [
+              {
+                "code": "decimal",
+                "label": "শতক"
+              },
+              {
+                "code": "bigha",
+                "label": "বিঘা"
+              },
+              {
+                "code": "katha",
+                "label": "কাঠা"
+              },
+              {
+                "code": "acre",
+                "label": "একর"
+              },
+              {
+                "code": "don",
+                "label": "দোন"
+              },
+              {
+                "code": "kani",
+                "label": "কানী"
+              },
+              {
+                "code": "kora",
+                "label": "কড়া"
+              },
+              {
+                "code": "gonda",
+                "label": "গন্ডা"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_bigha",
+            "type": "string",
+            "label": "কত শতকে এক বিঘা?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "bigha",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_katha",
+            "type": "string",
+            "label": "কত শতকে এক কাঠা?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "katha",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_acre",
+            "type": "string",
+            "label": "কত শতকে এক একর?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "acre",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_don",
+            "type": "string",
+            "label": "কত শতকে এক দোন?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "don",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_kani",
+            "type": "string",
+            "label": "কত শতকে এক কানী?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "kani",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_kora",
+            "type": "string",
+            "label": "কত শতকে এক কড়া?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "kora",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimals_per_gonda",
+            "type": "string",
+            "label": "কত শতকে এক গন্ডা?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "gonda",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "ownership",
+            "type": "multi_select",
+            "label": "কৃষি জমির মালিকানা?",
+            "options": [
+              {
+                "code": "own",
+                "label": "নিজের মালিকানাধীন"
+              },
+              {
+                "code": "lease_mortgage",
+                "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "katha_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত কাঠা:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "katha",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "katha_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত কাঠা:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "katha",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "bigha_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত বিঘা:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "bigha",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "bigha_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত বিঘা:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "bigha",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "acre_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত একর:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "acre",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "acre_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত একর:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "acre",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "kora_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত কড়া:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "kora",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "kora_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত কড়া:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "kora",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "don_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত দোন:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "ownership",
+                  "value": [
+                    "own"
+                  ],
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "don",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "don_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত দোন:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "don",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "kani_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত কানী:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "kani",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "kani_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত কানী:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "kani",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "gonda_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত গন্ডা:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "gonda",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "gonda_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত গন্ডা:",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "gonda",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimal_own",
+            "type": "string",
+            "label": "নিজের মালিকানাধীন কত শতক :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "decimal",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "own",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "decimal_lease_mortgage",
+            "type": "string",
+            "label": "লিজ/বর্গা/পত্তন/কর্ড/বন্ধক কত শতক :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "farmland",
+                  "value": "decimal",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ownership",
+                  "value": "lease_mortgage",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "household_farm_assets",
+            "type": "multi_select",
+            "label": "কৃষকের কী কী গবাদি পশুপাখি আছে?",
+            "options": [
+              {
+                "code": "cow",
+                "label": "গরু"
+              },
+              {
+                "code": "goat",
+                "label": "ছাগল"
+              },
+              {
+                "code": "sheep",
+                "label": "ভেড়া"
+              },
+              {
+                "code": "duck",
+                "label": "হাঁস"
+              },
+              {
+                "code": "chicken",
+                "label": "মুরগি"
+              },
+              {
+                "code": "horse",
+                "label": "ঘোড়া"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_cows",
+            "type": "string",
+            "label": "গরু কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_goats",
+            "type": "string",
+            "label": "ছাগল কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "goat",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_sheep",
+            "type": "string",
+            "label": "ভেড়া কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "sheep",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_ducks",
+            "type": "string",
+            "label": "হাঁস কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "duck",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_chicken",
+            "type": "string",
+            "label": "মুরগি কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "chicken",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_horses",
+            "type": "string",
+            "label": "ঘোড়া কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "horse",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_other_farm_assets",
+            "type": "string",
+            "label": "অন্যান্য পশুপাখি কয়টি :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "other_farm_asset_names",
+            "type": "text",
+            "label": "অন্যান্য পশুপাখির নাম :",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "household_farm_assets",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "smartphone_ownership",
+            "type": "select",
+            "label": "কৃষকের বা পরিবারের কারো স্মার্টফোন/টাচফোন আছে?",
+            "options": [
+              {
+                "code": "own",
+                "label": "নিজের"
+              },
+              {
+                "code": "family_member",
+                "label": "পরিবারের অন্যকারো"
+              },
+              {
+                "code": "both",
+                "label": "উভয়ের"
+              },
+              {
+                "code": "none",
+                "label": "নেই"
+              }
+            ],
+            "required": true,
+            "visible_when": null
+          },
+          {
+            "key": "agri_machineries",
+            "type": "multi_select",
+            "label": "কৃষকের নিম্নলিখিত কোন কোন কৃষি যন্ত্রপাতি আছে চিহ্নিত করুন?",
+            "options": [
+              {
+                "code": "tiller",
+                "label": "পাওয়ার টিলার"
+              },
+              {
+                "code": "shallow_machine",
+                "label": "স্যালো মেশিন"
+              },
+              {
+                "code": "spray",
+                "label": "স্প্রে মেশিন"
+              },
+              {
+                "code": "threshing_machine",
+                "label": "মাড়াই মেশিন"
+              },
+              {
+                "code": "irrigation_pump",
+                "label": "সেঁচ পাম্প"
+              },
+              {
+                "code": "chopper_machine",
+                "label": "খড়কাটা মেশিন"
+              },
+              {
+                "code": "none",
+                "label": "নেই"
+              }
+            ],
+            "required": true,
+            "visible_when": null
+          }
+        ]
+      },
+      {
+        "title": "Crop Details",
+        "fields": [
+          {
+            "key": "current_landsize",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে  চাষ করতে চান?(শতক)",
+            "required": true,
+            "visible_when": {
+              "any": [
+                {
+                  "op": "in",
+                  "key": "project_sub_type",
+                  "value": [
+                    "Crop-6",
+                    "Vegetable-7",
+                    "Fruit-8"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "paddy_variety",
+            "type": "select",
+            "label": "আপনি কোন জাতের ধান চাষ করতে চান?",
+            "options": [
+              {
+                "code": "br17",
+                "label": "বি আর ১৭"
+              },
+              {
+                "code": "br49",
+                "label": "বি আর ৪৯"
+              },
+              {
+                "code": "br75",
+                "label": "বি আর ৭৫"
+              },
+              {
+                "code": "br90",
+                "label": "বি আর ৯০"
+              },
+              {
+                "code": "swarna05",
+                "label": "স্বর্ণা ৫"
+              },
+              {
+                "code": "guti_swarna",
+                "label": "গুটি স্বর্ণা"
+              },
+              {
+                "code": "chinigura",
+                "label": "চিনিগুঁড়া (ব্রি ৩৪)"
+              },
+              {
+                "code": "sonamukhi",
+                "label": "সোনামুখী কাটারি"
+              },
+              {
+                "code": "shampa",
+                "label": "শম্পা কাটারি"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "item_name_crops",
+                  "value": "Paddy",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Crop-6",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "paddy_variety_others",
+            "type": "text",
+            "label": "অন্য জাতের নাম?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "paddy_variety",
+                  "value": "others",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Crop-6",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_crops",
+                  "value": "Paddy",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "previous_year_landsize",
+            "type": "string",
+            "label": "গত বছর কতটুকু জমিতে  চাষ করেছিলেন? (শতক):",
+            "required": true,
+            "visible_when": {
+              "any": [
+                {
+                  "op": "in",
+                  "key": "project_sub_type",
+                  "value": [
+                    "Crop-6",
+                    "Vegetable-7",
+                    "Fruit-8"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "previous_paddy_variety",
+            "type": "select",
+            "label": "গত বছর কোন জাতের ধান চাষ করেছিলেন?",
+            "options": [
+              {
+                "code": "br17",
+                "label": "বি আর ১৭"
+              },
+              {
+                "code": "br49",
+                "label": "বি আর ৪৯"
+              },
+              {
+                "code": "br75",
+                "label": "বি আর ৭৫"
+              },
+              {
+                "code": "br90",
+                "label": "বি আর ৯০"
+              },
+              {
+                "code": "swarna05",
+                "label": "স্বর্ণা ৫"
+              },
+              {
+                "code": "guti_swarna",
+                "label": "গুটি স্বর্ণা"
+              },
+              {
+                "code": "chinigura",
+                "label": "চিনিগুঁড়া (ব্রি ৩৪)"
+              },
+              {
+                "code": "sonamukhi",
+                "label": "সোনামুখী কাটারি"
+              },
+              {
+                "code": "shampa",
+                "label": "শম্পা কাটারি"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "item_name_crops",
+                  "value": "Paddy",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Crop-6",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "previous_paddy_variety_others",
+            "type": "text",
+            "label": "অন্য জাতের নাম?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "item_name_crops",
+                  "value": "Paddy",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "previous_paddy_variety",
+                  "value": "others",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Crop-6",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": true,
+            "visible_when": {
+              "any": [
+                {
+                  "op": "in",
+                  "key": "project_sub_type",
+                  "value": [
+                    "Crop-6",
+                    "Vegetable-7",
+                    "Fruit-8"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "yield",
+            "type": "string",
+            "label": "আপনার ফলন কতটুকু হয়েছিল? (কত মণ):",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "project_sub_type",
+                  "value": [
+                    "Crop-6",
+                    "Vegetable-7",
+                    "Fruit-8"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "unit_price",
+            "type": "string",
+            "label": "প্রতি মণের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": true,
+            "visible_when": {
+              "any": [
+                {
+                  "op": "in",
+                  "key": "project_sub_type",
+                  "value": [
+                    "Crop-6",
+                    "Vegetable-7",
+                    "Fruit-8"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "loan_amount",
+            "type": "string",
+            "label": "আপনি কত টাকা লোন নিতে চান?",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Livestock",
+        "fields": [
+          {
+            "key": "cow_purpose",
+            "type": "multi_select",
+            "label": "আপনার গরু পালনের উদ্দেশ্য কি?",
+            "options": [
+              {
+                "code": "meat",
+                "label": "মাংস/মোটাতাজাকরণ"
+              },
+              {
+                "code": "milk",
+                "label": "দুধ উৎপাদন"
+              },
+              {
+                "code": "breeding",
+                "label": "প্রজনন"
+              },
+              {
+                "code": "purchase_food",
+                "label": "গরুর খাদ্য/ফিড ক্রয়"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "cow_breed",
+            "type": "select",
+            "label": "আপনি কোন জাতের গরু পালন করবেন?",
+            "options": [
+              {
+                "code": "local",
+                "label": "দেশী/লোকাল"
+              },
+              {
+                "code": "shahiwal",
+                "label": "শাহীওয়াল"
+              },
+              {
+                "code": "friesian",
+                "label": "ফ্রিজিয়ান"
+              },
+              {
+                "code": "jersey",
+                "label": "জার্সি"
+              },
+              {
+                "code": "cross",
+                "label": "ক্রস"
+              },
+              {
+                "code": "pabna_variety",
+                "label": "পাবনা জাত"
+              },
+              {
+                "code": "rcc",
+                "label": "রেড চিটাগাং (আর.সি.সি)"
+              },
+              {
+                "code": "red_shindhi",
+                "label": "লাল সিন্ধি গরু"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "cowshed_material",
+            "type": "select",
+            "label": "গোয়ালঘরের কাঠামো কিসের তৈরি ?",
+            "options": [
+              {
+                "code": "paka",
+                "label": "পাকা"
+              },
+              {
+                "code": "semi_paka",
+                "label": "আধা-পাকা"
+              },
+              {
+                "code": "tin",
+                "label": "টিন"
+              },
+              {
+                "code": "kacha_bamboo_wood",
+                "label": "কাঁচা (বাঁশ/কাঠ)"
+              },
+              {
+                "code": "mud",
+                "label": "মাটি"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "cowshed_facility",
+            "type": "multi_select",
+            "label": "আপনার গোয়ালঘরে নিম্নলিখিত কোন সুবিধাগুলো আছে ?",
+            "options": [
+              {
+                "code": "matt",
+                "label": "ম্যাট"
+              },
+              {
+                "code": "motor_pump",
+                "label": "মোটর পাম্প"
+              },
+              {
+                "code": "fan",
+                "label": "ফ্যান"
+              },
+              {
+                "code": "light",
+                "label": "লাইট"
+              },
+              {
+                "code": "mosquito_net",
+                "label": "মশারী"
+              },
+              {
+                "code": "coil",
+                "label": "মশার কয়েল/স্প্রে"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "cowshed_capacity",
+            "type": "string",
+            "label": "আপনার গোয়ালঘরে কয়টি গরু রাখার জায়গা আছে ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "cow_transactional_data",
+            "type": "select",
+            "label": "নিম্নলিখিত কয়টি বিক্রয়কৃত গরু পালনের আয় ব্যয়ের তথ্য দিতে পারবেন?",
+            "options": [
+              {
+                "code": "1",
+                "label": "১ টি গরু"
+              },
+              {
+                "code": "2",
+                "label": "২ টি গরু"
+              },
+              {
+                "code": "0",
+                "label": "গত ৩ বছরে কোনো গরু বিক্রয় করিনি"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_1_breed",
+            "type": "select",
+            "label": "গরুটি কোন জাতের?",
+            "options": [
+              {
+                "code": "local",
+                "label": "দেশী/লোকাল"
+              },
+              {
+                "code": "shahiwal",
+                "label": "শাহীওয়াল"
+              },
+              {
+                "code": "friesian",
+                "label": "ফ্রিজিয়ান"
+              },
+              {
+                "code": "jersey",
+                "label": "জার্সি"
+              },
+              {
+                "code": "cross",
+                "label": "ক্রস"
+              },
+              {
+                "code": "pabna_variety",
+                "label": "পাবনা জাত"
+              },
+              {
+                "code": "rcc",
+                "label": "রেড চিটাগাং (আর.সি.সি)"
+              },
+              {
+                "code": "red_shindhi",
+                "label": "লাল সিন্ধি গরু"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "cow_transactional_data",
+                  "value": [
+                    "1",
+                    "2"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_1_purchase_price",
+            "type": "string",
+            "label": "গরুটির ক্রয়মূল্য",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "cow_transactional_data",
+                  "value": [
+                    "1",
+                    "2"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_1_duration",
+            "type": "integer",
+            "label": "গরুটি কতদিন পালন করেছেন (কয় মাস)?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "cow_transactional_data",
+                  "value": [
+                    "1",
+                    "2"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_1_rearing_cost",
+            "type": "string",
+            "label": "গরু পালনে মোট খরচ:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "cow_transactional_data",
+                  "value": [
+                    "1",
+                    "2"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_1_sell",
+            "type": "string",
+            "label": "গরুটির বিক্রয়মূল্য:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "cow_transactional_data",
+                  "value": [
+                    "1",
+                    "2"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_2_breed",
+            "type": "select",
+            "label": "২য় গরুটি কোন জাতের?",
+            "options": [
+              {
+                "code": "local",
+                "label": "দেশী/লোকাল"
+              },
+              {
+                "code": "shahiwal",
+                "label": "শাহীওয়াল"
+              },
+              {
+                "code": "friesian",
+                "label": "ফ্রিজিয়ান"
+              },
+              {
+                "code": "jersey",
+                "label": "জার্সি"
+              },
+              {
+                "code": "cross",
+                "label": "ক্রস"
+              },
+              {
+                "code": "pabna_variety",
+                "label": "পাবনা জাত"
+              },
+              {
+                "code": "rcc",
+                "label": "রেড চিটাগাং (আর.সি.সি)"
+              },
+              {
+                "code": "red_shindhi",
+                "label": "লাল সিন্ধি গরু"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "cow_transactional_data",
+                  "value": "2",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_2_purchase_price",
+            "type": "string",
+            "label": "২য় গরুটির ক্রয়মূল্য",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "cow_transactional_data",
+                  "value": "2",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_2_duration",
+            "type": "string",
+            "label": "২য় গরুটি কতদিন পালন করেছেন (কয় মাস)?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "cow_transactional_data",
+                  "value": "2",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_2_rearing_cost",
+            "type": "string",
+            "label": "২য় গরু পালনে মোট খরচ:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "cow_transactional_data",
+                  "value": "2",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "if_2_sell",
+            "type": "string",
+            "label": "২য় গরুটির বিক্রয়মূল্য:",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "cow_transactional_data",
+                  "value": "2",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_selling_goats",
+            "type": "string",
+            "label": "গত এক বছরে মোট কয়টি ছাগল বিক্রয় করেছেন?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Goat",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "selling_price",
+            "type": "string",
+            "label": "সর্বমোট বিক্রয়মূল্যের পরিমাণ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Goat",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "purchase_and_rearing_cost",
+            "type": "string",
+            "label": "বিক্রয়কৃত ছাগলের ক্রয়মূল্য ও পালনের সর্বমোট খরচ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Goat",
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "Other Farming Activity",
+        "fields": [
+          {
+            "key": "other_farming_activity",
+            "type": "multi_select",
+            "label": " আপনি আর কোন কোন ফসল ও ফল চাষ করেন?",
+            "options": [
+              {
+                "code": "maize",
+                "label": "ভুট্টা"
+              },
+              {
+                "code": "potato",
+                "label": "আলু"
+              },
+              {
+                "code": "paddy",
+                "label": "ধান"
+              },
+              {
+                "code": "onion",
+                "label": "পেঁয়াজ"
+              },
+              {
+                "code": "chili",
+                "label": "মরিচ"
+              },
+              {
+                "code": "mustard",
+                "label": "সরিষা"
+              },
+              {
+                "code": "vegetable",
+                "label": "সবজি"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              },
+              {
+                "code": "none",
+                "label": "নেই"
+              }
+            ],
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "maize_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে ভুট্টা চাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "maize",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "maize_invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "maize",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "maize_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "maize",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "maize_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ ভুট্টার বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "maize",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "potato_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে আলু চাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "potato",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "potato_invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "potato",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "potato_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "potato",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "potato_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ আলুর বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "potato",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "paddy_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে ধান চাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "paddy",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "ofa_paddy_variety",
+            "type": "select",
+            "label": "কোন জাতের ধান চাষ করেছিলেন",
+            "options": [
+              {
+                "code": "br17",
+                "label": "বি আর ১৭"
+              },
+              {
+                "code": "br49",
+                "label": "বি আর ৪৯"
+              },
+              {
+                "code": "br75",
+                "label": "বি আর ৭৫"
+              },
+              {
+                "code": "br90",
+                "label": "বি আর ৯০"
+              },
+              {
+                "code": "swarna05",
+                "label": "স্বর্ণা ৫"
+              },
+              {
+                "code": "guti_swarna",
+                "label": "গুটি স্বর্ণা"
+              },
+              {
+                "code": "chinigura",
+                "label": "চিনিগুঁড়া (ব্রি ৩৪)"
+              },
+              {
+                "code": "sonamukhi",
+                "label": "সোনামুখী কাটারি"
+              },
+              {
+                "code": "shampa",
+                "label": "শম্পা কাটারি"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "paddy",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "ofa_paddy_variety_others",
+            "type": "text",
+            "label": "অন্য জাতের নাম?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "paddy",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "ofa_paddy_variety",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "paddy_invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "paddy",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "paddy_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "paddy",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "paddy_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ ধানের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "paddy",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "onion_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে পেঁয়াজ চাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "onion",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "onion_invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "onion",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "onion_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "onion",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "onion_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ পেঁয়াজের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "onion",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "chili_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে মরিচচাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "chili",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "chili_invest",
+            "type": "integer",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "chili",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "chili_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "chili",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "chili_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ মরিচের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "chili",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "mustard_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে সরিষাচাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "mustard",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "mustard_invest",
+            "type": "decimal",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "mustard",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "mustard_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "mustard",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "mustard_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ সরিষা বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "mustard",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "vegetable_name",
+            "type": "text",
+            "label": "আপনি কোন সবজী চাষ করেছিলেন?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "vegetable",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "vegetable_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে সবজী চাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "vegetable",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "vegetable_invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল? (মৌসুমে):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "vegetable",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "vegetable_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "vegetable",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "vegetable_unit_price",
+            "type": "string",
+            "label": "প্রতি মণ সবজীর বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "vegetable",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_farming",
+            "type": "string",
+            "label": "অন্নান্য কৃষিকাজ কী কী ?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_land_size",
+            "type": "string",
+            "label": "আপনি কতটুকু জমিতে চাষ করেছিলেন? (শতক):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_invest",
+            "type": "string",
+            "label": "আপনার সর্বমোট কত টাকা খরচ হয়েছিল?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_yield",
+            "type": "string",
+            "label": "আপনার ফলন কতুটুকু হয়েছিল? (কত মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_unit_price",
+            "type": "string",
+            "label": "প্রতি মণের বিক্রয়মূল্য কত ছিল? (প্রতি মণ):",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activity",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "Other Farming Activity Livestock",
+        "fields": [
+          {
+            "key": "other_farming_activities_livestock",
+            "type": "multi_select",
+            "label": " আপনি আর কোন কোন গবাদী পশু পাখি পালন করেন?",
+            "options": [
+              {
+                "code": "cow",
+                "label": "গরু"
+              },
+              {
+                "code": "goat",
+                "label": "ছাগল"
+              },
+              {
+                "code": "poultry",
+                "label": "পোল্ট্রি/মুরগি"
+              },
+              {
+                "code": "duck",
+                "label": "হাঁস"
+              },
+              {
+                "code": "fisheries",
+                "label": "মৎস্যচাষ"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              },
+              {
+                "code": "none",
+                "label": "নেই"
+              }
+            ],
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "sold_cows_number",
+            "type": "string",
+            "label": "গত এক বছরে কয়টি গরু বিক্রি করেছেন?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "sold_cows_profit",
+            "type": "string",
+            "label": "সর্বমোট কত টাকা লাভ হয়েছিল?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "sold_goats_number",
+            "type": "string",
+            "label": "গত এক বছরে কয়টি ছাগল বিক্রি করেছেন?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "goat",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "sold_goat_profit",
+            "type": "string",
+            "label": "সর্বমোট কত টাকা লাভ হয়েছিল?",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "goat",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "duck_invest",
+            "type": "string",
+            "label": "গত এক বছরে হাঁস পালনে সর্বমোট খরচ বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "duck",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "duck_sell",
+            "type": "string",
+            "label": "গত এক বছরে পালন করা সব হাঁসের  বিক্রয়মূল্য বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "duck",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "poultry_invest",
+            "type": "string",
+            "label": "গত এক বছরে পোল্ট্রি/মুরগি পালনে সর্বমোট খরচ বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "poultry",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "poultry_sell",
+            "type": "string",
+            "label": "গত এক বছরে পোল্ট্রি/মুরগি পালনে বিক্রয়মূল্য বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "poultry",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "fisheries_invest",
+            "type": "string",
+            "label": "গত এক বছরে মাছচাষে সর্বমোট খরচ বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "fisheries",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "fisheries_sell",
+            "type": "string",
+            "label": "গত এক বছরে মাছচাষের বিক্রয়মূল্য বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "fisheries",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_livestock",
+            "type": "text",
+            "label": "অন্যান্য গবাদী পশু পাখির নাম:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_livestock_invest",
+            "type": "string",
+            "label": "গত এক বছরে এই গবাদী পশু পাখি পালনে সর্বমোট খরচ বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "others_livestock_sell",
+            "type": "string",
+            "label": "গত এক বছরে এই গবাদী পশু পাখির বিক্রয়মূল্য বাৎসরিক:",
+            "required": false,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "other_farming_activities_livestock",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "Loan Details",
+        "fields": [
+          {
+            "key": "current_loan_count",
+            "type": "select",
+            "label": "কৃষকের নিজের রানিং/চলমান লোন কয়টি?",
+            "options": [
+              {
+                "code": "1",
+                "label": "১"
+              },
+              {
+                "code": "2",
+                "label": "২"
+              },
+              {
+                "code": "3",
+                "label": "৩"
+              },
+              {
+                "code": "0",
+                "label": "কোন লোন নেই"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "current_loan_amount",
+            "type": "string",
+            "label": "সর্বমোট ঋণের টাকার পরিমাণ ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "current_loan_duration",
+            "type": "string",
+            "label": "ঋণের মেয়াদ/সময়কাল (কত মাস) ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "current_loan_repaid_amount",
+            "type": "string",
+            "label": "লোণের কত টাকা পরিশোধ করেছেন?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "loan_access",
+            "type": "text",
+            "label": "কোথা থেকে  লোন নিয়েছেন?",
+            "options": [
+              {
+                "code": "bank",
+                "label": "ব্যাংক"
+              },
+              {
+                "code": "mfi",
+                "label": "এমএফআই/এন.জি.ও"
+              },
+              {
+                "code": "cooperative_society",
+                "label": "সমবায় সমিতি"
+              },
+              {
+                "code": "money_lender",
+                "label": "মহাজন"
+              },
+              {
+                "code": "dadon",
+                "label": "দাদন ব্যবসায়ী"
+              },
+              {
+                "code": "none",
+                "label": "কোনোটিই নয়"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "loan_reason",
+            "type": "select",
+            "label": "নিম্নলিখিত কোন কারণে লোনটি নিয়েছেন :",
+            "options": [
+              {
+                "code": "livestock",
+                "label": "গবাদি পশুপালন (গরু/ছাগল/ভেড়া)"
+              },
+              {
+                "code": "crop",
+                "label": "শস্য চাষ"
+              },
+              {
+                "code": "duck_poultry",
+                "label": "পোলট্রি (হাঁস/মুরগী)"
+              },
+              {
+                "code": "agri_machineries",
+                "label": "কৃষি যন্ত্রপাতি (মেশিনারিজ)"
+              },
+              {
+                "code": "fisheries",
+                "label": "মাছচাষ"
+              },
+              {
+                "code": "fruits_garden",
+                "label": "ফলের বাগান"
+              },
+              {
+                "code": "treatment",
+                "label": "চিকিৎসা"
+              },
+              {
+                "code": "business",
+                "label": "ব্যবসা"
+              },
+              {
+                "code": "house_construction",
+                "label": "বাড়ি নির্মাণ"
+              },
+              {
+                "code": "child_marriage",
+                "label": "সন্তানের বিয়ে"
+              },
+              {
+                "code": "personal",
+                "label": "ব্যক্তিগত"
+              },
+              {
+                "code": "child_employment_purpose",
+                "label": "সন্তানের চাকুরীর জন্য টাকা প্রদান"
+              },
+              {
+                "code": "child_abroad_purpose",
+                "label": "সন্তানের বিদেশ গমন"
+              },
+              {
+                "code": "lease_mortgage_buy",
+                "label": "জমি লিজ/পত্তন/কিনেছেন"
+              },
+              {
+                "code": "bribe",
+                "label": "ঘুষ/উৎকোচ প্রদান"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "current_spouse_loan_count",
+            "type": "select",
+            "label": "কৃষকের স্বামী/স্ত্রীর রানিং/চলমান লোন কয়টি?",
+            "options": [
+              {
+                "code": "1",
+                "label": "১"
+              },
+              {
+                "code": "2",
+                "label": "২"
+              },
+              {
+                "code": "3",
+                "label": "৩"
+              },
+              {
+                "code": "0",
+                "label": "কোন লোন নেই"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "current_spouse_loan_amount",
+            "type": "string",
+            "label": "সর্বমোট ঋণের টাকার পরিমাণ ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_spouse_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "current_spouse_loan_duration",
+            "type": "string",
+            "label": "ঋণের মেয়াদ/সময়কাল (কত মাস) ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_spouse_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "spouse_loan_repaid_amount",
+            "type": "string",
+            "label": "লোণের কত টাকা পরিশোধ করেছেন?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_spouse_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "spouse_loan_access",
+            "type": "text",
+            "label": "কোথা থেকে লোন নিয়েছেন?",
+            "options": [
+              {
+                "code": "bank",
+                "label": "ব্যাংক"
+              },
+              {
+                "code": "mfi",
+                "label": "এমএফআই/এন.জি.ও"
+              },
+              {
+                "code": "cooperative_society",
+                "label": "সমবায় সমিতি"
+              },
+              {
+                "code": "money_lender",
+                "label": "মহাজন"
+              },
+              {
+                "code": "dadon",
+                "label": "দাদন ব্যবসায়ী"
+              },
+              {
+                "code": "none",
+                "label": "কোনোটিই নয়"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_spouse_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "spouse_loan_reason",
+            "type": "select",
+            "label": "নিম্নলিখিত কোন কারণে লোনটি নিয়েছেন :",
+            "options": [
+              {
+                "code": "livestock",
+                "label": "গবাদি পশুপালন (গরু/ছাগল/ভেড়া)"
+              },
+              {
+                "code": "crop",
+                "label": "শস্য চাষ"
+              },
+              {
+                "code": "duck_poultry",
+                "label": "পোলট্রি (হাঁস/মুরগী)"
+              },
+              {
+                "code": "agri_machineries",
+                "label": "কৃষি যন্ত্রপাতি (মেশিনারিজ)"
+              },
+              {
+                "code": "fisheries",
+                "label": "মাছচাষ"
+              },
+              {
+                "code": "fruits_garden",
+                "label": "ফলের বাগান"
+              },
+              {
+                "code": "treatment",
+                "label": "চিকিৎসা"
+              },
+              {
+                "code": "business",
+                "label": "ব্যবসা"
+              },
+              {
+                "code": "house_construction",
+                "label": "বাড়ি নির্মাণ"
+              },
+              {
+                "code": "child_marriage",
+                "label": "সন্তানের বিয়ে"
+              },
+              {
+                "code": "personal",
+                "label": "ব্যক্তিগত"
+              },
+              {
+                "code": "child_employment_purpose",
+                "label": "সন্তানের চাকুরীর জন্য টাকা প্রদান"
+              },
+              {
+                "code": "child_abroad_purpose",
+                "label": "সন্তানের বিদেশ গমন"
+              },
+              {
+                "code": "lease_mortgage_buy",
+                "label": "জমি লিজ/পত্তন/কিনেছেন"
+              },
+              {
+                "code": "bribe",
+                "label": "ঘুষ/উৎকোচ প্রদান"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "in",
+                  "key": "current_spouse_loan_count",
+                  "value": [
+                    "1",
+                    "2",
+                    "3"
+                  ],
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "Cow management & health",
+        "fields": [
+          {
+            "key": "vaccine_names",
+            "type": "multi_select",
+            "label": "নিম্নলিখিত কোন কোন টিকা দিয়েছেন?",
+            "options": [
+              {
+                "code": "khurarog",
+                "label": "ক্ষুরারোগ"
+              },
+              {
+                "code": "tarka",
+                "label": "তড়কা"
+              },
+              {
+                "code": "badla",
+                "label": "বাদলা"
+              },
+              {
+                "code": "golafola",
+                "label": "গলাফুলা"
+              },
+              {
+                "code": "lumpy_skin_disease",
+                "label": "লাম্পি স্কীন রোগ"
+              },
+              {
+                "code": "none",
+                "label": "টিকা দেই না"
+              }
+            ],
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "deworming_frequency",
+            "type": "select",
+            "label": "গরুকে বছরে কতবার কৃমিনাশক ওষুধ দেন?",
+            "options": [
+              {
+                "code": "1",
+                "label": "বছরে ১ বার"
+              },
+              {
+                "code": "2",
+                "label": "বছরে ২ বার"
+              },
+              {
+                "code": "3",
+                "label": "বছরে ৩ বার"
+              },
+              {
+                "code": "4",
+                "label": "বছরে ৪ বার"
+              },
+              {
+                "code": "5",
+                "label": "বছরে ৫ বার"
+              },
+              {
+                "code": "6",
+                "label": "বছরে ৬ বার"
+              },
+              {
+                "code": "none",
+                "label": "কোন কৃমিনাশক দেয়া হয়নি"
+              }
+            ],
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "project_sub_type",
+                  "value": "Livestock",
+                  "source": "answer"
+                },
+                {
+                  "op": "eq",
+                  "key": "item_name_livestock",
+                  "value": "Cow",
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "Income & Expense",
+        "fields": [
+          {
+            "key": "number_of_dependents",
+            "type": "string",
+            "label": "পরিবারের মোট সদস্য সংখ্যা ?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "number_of_earning_members",
+            "type": "string",
+            "label": "পরিবারের মোট  উপার্জনকারী  সদস্য সংখ্যা কতজন?",
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "individual_income_sources",
+            "type": "multi_select",
+            "label": "কৃষিকাজ  ছাড়া কৃষকের বাকি আয়ের উৎসগুলো কি কি?",
+            "options": [
+              {
+                "code": "business",
+                "label": "ব্যবসা"
+              },
+              {
+                "code": "labor",
+                "label": "শ্রম"
+              },
+              {
+                "code": "govt_job",
+                "label": "সরকারি চাকরি"
+              },
+              {
+                "code": "private_job",
+                "label": "বেসরকারি চাকরি"
+              },
+              {
+                "code": "driver",
+                "label": "অটো/ভ্যান/বাস/ট্রাক/ অন্যান্য পরিবহন চালক"
+              },
+              {
+                "code": "stipend",
+                "label": "ভাতা"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_business",
+            "type": "string",
+            "label": "ব্যবসা হতে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "business",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "business_type",
+            "type": "select",
+            "label": "কোন ধরণের ব্যবসা?",
+            "options": [
+              {
+                "code": "cattle_fish_businees",
+                "label": "গবাদী পশু ও মৎস্য ব্যবসায়ী"
+              },
+              {
+                "code": "shop",
+                "label": "মুদি/ফল/সবজির দোকান"
+              },
+              {
+                "code": "foriya",
+                "label": "কৃষি পণ্য ফড়িয়া/পাইকারি  কেনাবেচা"
+              },
+              {
+                "code": "input_seller",
+                "label": "কৃষি উপকরণ (সার/বীজ/কীটনাশক) ও পশুখাদ্যের দোকান"
+              },
+              {
+                "code": "transport_business",
+                "label": "পরিবহন ভাড়া থেকে আয় (অটো/ভ্যান//বাস/ট্রাক অন্যান্য)"
+              },
+              {
+                "code": "others",
+                "label": "অন্যান্য"
+              }
+            ],
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "business",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_labor",
+            "type": "string",
+            "label": "শ্রম হতে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "labor",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "labor_job_details",
+            "type": "text",
+            "label": "কোন ধরনের শ্রম বিস্তারিত জানান?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "labor",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_govt_job",
+            "type": "string",
+            "label": "সরকারি চাকরি হতে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "govt_job",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "govt_job_details",
+            "type": "text",
+            "label": "কোন ধরনের চাকরি বিস্তারিত জানান?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "govt_job",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_private_job",
+            "type": "string",
+            "label": "বেসরকারি চাকরি হতে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "private_job",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "private_job_details",
+            "type": "text",
+            "label": "কোন ধরনের চাকরি বিস্তারিত জানান?",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "private_job",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_driving",
+            "type": "string",
+            "label": "অটো/ভ্যান/বাস/ট্রাক/ অন্যান্য পরিবহন চালিয়ে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "driver",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_stipend",
+            "type": "text",
+            "label": "ভাতা হতে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "stipend",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "income_from_others",
+            "type": "text",
+            "label": "অন্যান্য উৎস হতে আয়ের পরিমাণ (বাৎসরিক)",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "eq",
+                  "key": "individual_income_sources",
+                  "value": "others",
+                  "source": "answer"
+                }
+              ]
+            }
+          },
+          {
+            "key": "monthly_expenses",
+            "type": "string",
+            "label": "কৃষকের মোট মাসিক ব্যয়ের পরিমান (খাদ্য, শিক্ষা, চিকিৎসা অন্যান্য সকল ব্যয়):",
+            "required": true,
+            "visible_when": {
+              "all": [
+                {
+                  "op": "neq",
+                  "key": "agri_activity",
+                  "value": "no",
+                  "source": "answer"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "title": "MF Relation",
+        "fields": [
+          {
+            "key": "how_do_you_know_the_mf",
+            "type": "text",
+            "label": "আমাদের মার্কেট ফ্যাসিলিটেটর/ফিল্ড অফিসার /এজেন্টকে  কিভাবে চেনেন  ও সম্পর্ক?",
+            "required": true
+          }
+        ]
+      }
+    ]
+  }
+}

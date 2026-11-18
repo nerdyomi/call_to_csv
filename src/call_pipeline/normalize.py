@@ -7,7 +7,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from .schema import Field, Schema
+from .rules import apply_rules, derive_land, why_hidden
+from .schema import ENG_NOTES, NOTES, Field, Schema
 
 _BN_DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
 _NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
@@ -52,12 +53,21 @@ def parse_number(text: str) -> str | None:
 
 
 def _split_multi(text: str) -> list[str]:
-    seen: list[str] = []
-    for part in re.split(r"[,;|]", text):
-        p = re.sub(r"\s+", "_", part.strip().lower())
-        if p and p not in seen:
-            seen.append(p)
-    return seen
+    return [p.strip() for p in re.split(r"[,;|]", text) if p.strip()]
+
+
+def _key(s: str) -> str:
+    """Comparison form of an option code or label: case, spaces, '_' and '-' do not matter."""
+    return re.sub(r"[\s_\-]+", "", s.lower().translate(_BN_DIGITS))
+
+
+def match_option(f: Field, token: str) -> str | None:
+    """The option CODE for something the AI wrote: the code itself, or its Bangla label, in any casing."""
+    k = _key(token)
+    for code, label in f.options:
+        if k == _key(code) or k == _key(label):
+            return code
+    return None
 
 
 def _normalize_value(f: Field, raw: str, closed: bool) -> tuple[str | None, str | None]:
@@ -68,17 +78,24 @@ def _normalize_value(f: Field, raw: str, closed: bool) -> tuple[str | None, str 
     if f.type == "number":
         n = parse_number(raw)
         return (n, None) if n is not None else (None, f"not a number: {raw!r}")
-    if f.type == "enum":
-        v = re.sub(r"\s+", "_", raw.lower())
-        if f.known_values and v not in f.known_values:
-            return (None, f"{v!r} not in {list(f.known_values)}") if closed else (v, f"new code {v!r}")
-        return v, None
-    if f.type == "multi":
-        items = _split_multi(raw)
-        new = [i for i in items if f.known_values and i not in f.known_values]
-        if new and closed:
-            items = [i for i in items if i not in new]
-        return ", ".join(items) or None, (f"new code(s) {new}" if new else None)
+    if f.type in ("enum", "multi"):
+        tokens = _split_multi(raw) if f.type == "multi" else [raw]
+        good: list[str] = []
+        bad: list[str] = []
+        for t in tokens:
+            code = match_option(f, t) if f.options else re.sub(r"\s+", "_", t.lower())
+            if code is None:
+                bad.append(t)
+            elif code not in good:
+                good.append(code)
+        problem = None
+        if bad:
+            allowed = ", ".join(c for c, _ in f.options[:12]) + ("…" if len(f.options) > 12 else "")
+            problem = f"not an option: {bad} (allowed: {allowed})"
+            if not closed:                       # keep what was said, but make it visible
+                good += [re.sub(r"\s+", "_", b.lower()) for b in bad]
+                problem = "new code " + problem
+        return (", ".join(good) or None), problem
     return raw, None
 
 
@@ -87,14 +104,14 @@ def build_row(raw: dict, schema: Schema) -> CallRow:
     for item in raw.get("fields", []):
         name = item.get("field", "")
         f = schema.by_name.get(name)
-        if f is None or f.source != "audio" or name in ("Notes", "eng_notes"):
+        if f is None or f.source != "audio" or name in (NOTES, ENG_NOTES):
             row.issues.append(Issue(name, "not_in_schema", "model returned a field that is not an audio field"))
             continue
         if name in row.values:
             row.issues.append(Issue(name, "duplicate", f"returned more than once; kept the last: {item.get('value')!r}"))
         value, problem = _normalize_value(f, str(item.get("value", "")), schema.closed_enums)
         if problem:
-            kind = "unknown_code" if problem.startswith("new code") else "invalid_value"
+            kind = "unknown_code" if problem.startswith("new code") else "invalid_option" if problem.startswith("not an option") else "invalid_value"
             row.issues.append(Issue(name, kind, problem))
         if value is None:
             row.values.pop(name, None)
@@ -106,8 +123,27 @@ def build_row(raw: dict, schema: Schema) -> CallRow:
         if item.get("confidence") == "low":
             row.issues.append(Issue(name, "low_confidence", item.get("evidence", "")))
 
-    row.values["Notes"] = (raw.get("notes") or "").strip()
-    row.values["eng_notes"] = (raw.get("eng_notes") or "").strip()
+    # --- the form's own rules: drop answers to questions it would not have asked, flag what is unverifiable or missing
+    outcome = apply_rules(schema, row.values)
+    for key, value in outcome.dropped.items():
+        row.values.pop(key, None)
+        row.evidence.pop(key, None)
+        row.issues = [i for i in row.issues if not (i.field == key and i.kind == "low_confidence")]
+        row.issues.append(Issue(key, "not_applicable", f"answered {value!r}, but the form only asks this when {why_hidden(schema, key)}; answer dropped"))
+    for gate, deps in outcome.unverified.items():
+        row.issues.append(Issue(gate, "missing_gate", f"{len(deps)} answer(s) depend on `{gate}`, which was not extracted: {', '.join(deps[:6])}{'…' if len(deps) > 6 else ''}"))
+    if outcome.missing_required:
+        n = len(outcome.missing_required)
+        row.issues.append(Issue("", "missing_required", f"{n} required question(s) that apply to this loan have no answer: {', '.join(outcome.missing_required[:12])}{'…' if n > 12 else ''}"))
+
+    # --- land in decimals, calculated from the unit, the amounts and the stated conversion
+    calc, why = derive_land(row.values)
+    for key, value in calc.items():
+        row.values[key] = value
+        row.evidence[key] = {"value": value, "confidence": "calculated", "evidence": why[key], "timestamp": ""}
+
+    row.values[NOTES] = (raw.get("notes") or "").strip()
+    row.values[ENG_NOTES] = (raw.get("eng_notes") or "").strip()
 
     prev = -1
     for turn in raw.get("transcript") or []:

@@ -22,20 +22,42 @@ def schema():
     return load_schema(PROJECT_ROOT / "config" / "schema.yaml")
 
 
-def test_schema_columns_match_reference_cex(schema):
-    ref = next(csv.reader(REF_HEADER.open(encoding="utf-8-sig")))
-    assert schema.columns[:len(ref)] == ref
-    assert schema.columns[len(ref):] == ["eng_notes"]
+def test_schema_is_built_from_the_real_form(schema):
+    q = {f.name: f for f in schema.question_fields}
+    assert schema.form_version == "65" and len(q) == 155 and "loan_id" not in q      # loan_id comes from the system
+    assert schema.by_name["loan_id"].source == "manifest"
+    cols = schema.columns
+    assert cols[0] == "Call ID" and cols.index("Notes") < cols.index("project_sub_type") < cols.index("how_do_you_know_the_mf")
+    assert cols[-1] == "eng_notes" and "calc_land_total_decimals" in cols and cols.index("calc_land_total_decimals") > cols.index("monthly_expenses")
+    assert q["yield"].type == "number" and q["decimals_per_bigha"].type == "number" and q["bigha_own"].type == "number"
+    assert q["income_from_stipend"].type == "number"                  # typed 'text' in the form, forced by overrides
+    assert q["farmland"].type == "enum" and ("bigha", "বিঘা") in q["farmland"].options
+    assert q["ownership"].type == "multi" and q["loan_access"].type == "enum"
+    assert q["vegetable_name"].type == "text" and q["how_do_you_know_the_mf"].type == "text"
+    assert q["cow_breed"].visible_when["all"][0] == {"op": "eq", "key": "project_sub_type", "value": "Livestock", "source": "answer"}
+    assert q["yield"].description.startswith("Total harvest") and "MAUND" in q["yield"].description
 
 
-def test_response_schema_lists_only_audio_fields(schema):
+def test_every_dependency_points_at_a_real_question(schema):
+    for f in schema.question_fields:
+        for mode in ("all", "any"):
+            for c in (f.visible_when or {}).get(mode, []):
+                assert c["key"] in schema.by_name, f"{f.name} depends on unknown {c['key']}"
+
+
+def test_response_schema_lists_only_form_questions(schema):
     enum = build_response_schema(schema)["properties"]["fields"]["items"]["properties"]["field"]["enum"]
-    assert "current_landsize" in enum and "Call ID" not in enum and "Notes" not in enum
+    assert len(enum) == 155 and "current_landsize" in enum and "decimals_per_bigha" in enum
+    assert not {"Call ID", "Notes", "eng_notes", "loan_id", "calc_land_total_decimals"} & set(enum)
 
 
-def test_system_prompt_contains_catalog(schema):
+def test_system_prompt_carries_the_form(schema):
     p = build_system_prompt(load_settings(require_key=False), schema)
-    assert "| farmland | multi | own, lease_mortgage |" in p
+    assert "`farmland` [enum, required] কৃষকের কৃষি জমির পরিমাণ:" in p
+    assert "bigha=বিঘা" in p and "ask only if: farmland = bigha" in p
+    assert "`decimals_per_bigha`" in p and "ask only if: project_sub_type = Livestock AND item_name_livestock = Cow" in p
+    assert "Yield and price are in MAUND" in p and "yield fields are in **kg**" not in p
+    assert "Answer with the option **code**" in p and "Follow the form's logic" in p
 
 
 @pytest.mark.parametrize("text,expected", [("40,000", "40000"), ("৫০,০০০", "50000"), ("16.50", "16.5"),
@@ -48,26 +70,86 @@ def item(field, value, conf="high"):
     return {"field": field, "value": value, "confidence": conf, "evidence": "q", "timestamp": "00:01"}
 
 
-def test_build_row_normalizes_and_flags(schema):
+def test_build_row_maps_options_applies_rules_and_calculates_land(schema):
     raw = {
-        "call_assessment": {"audio_quality": "poor", "is_kyc_call": True, "respondent_is_farmer": "yes",
-                            "language_note": ""},
-        "fields": [item("loan_amount", "40,000"), item("farmland", "Own, lease_mortgage"),
-                   item("own", "16.5", "low"), item("yield", "lots"), item("farmer_assets", "tv, bike"),
-                   item("loan_amount", "45000"), item("Call ID", "x")],
+        "call_assessment": {"audio_quality": "poor", "is_kyc_call": True, "respondent_is_farmer": "yes", "language_note": ""},
+        "fields": [
+            item("project_sub_type", "crop-6"), item("item_name_crops", "maize/corn"),
+            item("loan_amount", "40,000"), item("loan_amount", "45000"),
+            item("farmland", "বিঘা"), item("ownership", "own, লিজ/বর্গা/পত্তন/কর্ড/বন্ধক"),
+            item("bigha_own", "4"), item("bigha_lease_mortgage", "২"), item("decimals_per_bigha", "27"),
+            item("yield", "lots"), item("agri_machineries", "tractor, spray"),
+            item("smartphone_ownership", "both", "low"),
+            item("cow_breed", "local"),                       # a cow question on a crop loan: the form would not ask it
+            item("Call ID", "x"),
+        ],
         "notes": " n ", "eng_notes": "e", "warnings": ["land in bigha"],
     }
     row = build_row(raw, schema)
-    assert row.values["loan_amount"] == "45000"
-    assert row.values["farmland"] == "own, lease_mortgage"
-    assert "yield" not in row.values
-    assert row.values["farmer_assets"] == "tv, bike"
-    assert row.values["Notes"] == "n"
+    v = row.values
+    assert v["project_sub_type"] == "Crop-6" and v["item_name_crops"] == "Maize/Corn"        # any casing -> the option code
+    assert v["loan_amount"] == "45000"                                                        # last answer wins
+    assert v["farmland"] == "bigha" and v["ownership"] == "own, lease_mortgage"               # Bangla label -> code
+    assert v["bigha_lease_mortgage"] == "2"                                                   # Bangla digits
+    assert "yield" not in v and v["agri_machineries"] == "spray"
+    assert "cow_breed" not in v and "cow_breed" not in row.evidence
+    assert (v["calc_land_own_decimals"], v["calc_land_lease_decimals"], v["calc_land_total_decimals"]) == ("108", "54", "162")
+    assert row.evidence["calc_land_own_decimals"]["confidence"] == "calculated"
+    assert "4 bigha x 27" in row.evidence["calc_land_own_decimals"]["evidence"]
+    assert v["Notes"] == "n"
     kinds = {(i.field, i.kind) for i in row.issues}
-    assert ("loan_amount", "duplicate") in kinds and ("own", "low_confidence") in kinds
-    assert ("yield", "invalid_value") in kinds and ("farmer_assets", "unknown_code") in kinds
-    assert ("Call ID", "not_in_schema") in kinds
+    assert ("loan_amount", "duplicate") in kinds and ("smartphone_ownership", "low_confidence") in kinds
+    assert ("yield", "invalid_value") in kinds and ("agri_machineries", "invalid_option") in kinds
+    assert ("cow_breed", "not_applicable") in kinds and ("Call ID", "not_in_schema") in kinds
+    assert any(i.kind == "missing_required" for i in row.issues)
     assert any(i.detail == "poor audio quality" for i in row.issues)
+
+
+# ---- the form's "ask only if" rules ----
+
+def _vis(schema, answers):
+    from call_pipeline.rules import Visibility, to_answers
+    return Visibility(schema, to_answers(answers, schema))
+
+
+def test_visibility_follows_the_form_conditions(schema):
+    v = _vis(schema, {"project_sub_type": "Livestock", "item_name_livestock": "Cow"})
+    assert v.visible("cow_breed") is True and v.visible("current_landsize") is False
+    v = _vis(schema, {"project_sub_type": "Livestock", "item_name_livestock": "Goat"})
+    assert v.visible("cow_breed") is False and v.visible("number_of_selling_goats") is not None
+    v = _vis(schema, {"project_sub_type": "Crop-6", "item_name_crops": "Paddy"})
+    assert v.visible("current_landsize") is True and v.visible("paddy_variety") is True and v.visible("cow_breed") is False
+    # a hidden gate (agri_activity is only asked on non-farming loans) counts as "not no" -> farmland is asked
+    assert v.visible("farmland") is True
+    # multi-select gates: 'ownership' holds several codes
+    v = _vis(schema, {"project_sub_type": "Crop-6", "farmland": "bigha", "ownership": "own, lease_mortgage"})
+    assert v.visible("bigha_own") is True and v.visible("bigha_lease_mortgage") is True and v.visible("katha_own") is False
+    v = _vis(schema, {"project_sub_type": "Crop-6", "farmland": "bigha", "ownership": "own"})
+    assert v.visible("bigha_lease_mortgage") is False
+
+
+def test_unknown_gate_is_unknown_not_hidden(schema):
+    from call_pipeline.rules import apply_rules
+    out = apply_rules(schema, {"cow_breed": "local"})               # loan type never extracted
+    assert out.dropped == {} and out.unverified["project_sub_type"] == ["cow_breed"]
+    out = apply_rules(schema, {"project_sub_type": "Fish-5", "cow_breed": "local"})
+    assert out.dropped == {"cow_breed": "local"}
+
+
+def test_required_questions_that_apply_but_have_no_answer_are_listed(schema):
+    from call_pipeline.rules import apply_rules
+    out = apply_rules(schema, {"project_sub_type": "Livestock", "item_name_livestock": "Cow"})
+    assert "cow_breed" in out.missing_required and "current_landsize" not in out.missing_required and "loan_amount" in out.missing_required
+
+
+def test_land_calculation_needs_unit_amount_and_conversion():
+    from call_pipeline.rules import derive_land
+    assert derive_land({"farmland": "bigha", "bigha_own": "3", "decimals_per_bigha": "33"})[0] == {
+        "calc_land_own_decimals": "99", "calc_land_total_decimals": "99"}
+    assert derive_land({"farmland": "decimal", "decimal_own": "16.5", "decimal_lease_mortgage": "132"})[0] == {
+        "calc_land_own_decimals": "16.5", "calc_land_lease_decimals": "132", "calc_land_total_decimals": "148.5"}
+    assert derive_land({"farmland": "bigha", "bigha_own": "3"})[0] == {}              # no stated conversion: never guess
+    assert derive_land({"bigha_own": "3", "decimals_per_bigha": "33"})[0] == {}       # no unit chosen
 
 
 @pytest.mark.skipif(not SAMPLE.exists(), reason="reference recording missing")
@@ -90,7 +172,7 @@ class FakeExtractor:
         return GeminiResult(
             {"call_assessment": {"audio_quality": "good", "is_kyc_call": True, "respondent_is_farmer": "yes",
                                  "language_note": ""},
-             "fields": [item("loan_amount", "40000"), item("own", "16.5"), item("lease_mortgage", "132")],
+             "fields": [item("loan_amount", "40000"), item("farmland", "decimal"), item("decimal_own", "16.5")],
              "notes": "Farmer loan nibe 40 hajar.", "eng_notes": "Farmer wants 40k.", "warnings": []},
             {"prompt_tokens": 100, "audio_prompt_tokens": 80, "output_tokens": 50, "thought_tokens": 0,
              "total_tokens": 150}, "fake-model")
@@ -128,18 +210,17 @@ def test_end_to_end_with_fake_gemini(tmp_path, schema):
 def test_evaluate_statuses_and_phone_matching(schema):
     from call_pipeline.evaluate import compare, phone_key, summarize
     assert phone_key("+8801727641576") == phone_key("01727641576") == "1727641576"
-    truth = {"1727641576": {"loan_amount": "20000", "own": "65", "yield": "80", "farmland": "own, lease_mortgage",
+    truth = {"1727641576": {"loan_amount": "20000", "decimal_own": "65", "yield": "80", "ownership": "own, lease_mortgage",
                             "number_of_cows": "2", "business_type": "shop"}}
     pred = [{"Phone": "8801727641576", "Started at": "2026-11-01 18:31:00", "_stem": "x",
-             "loan_amount": "20000", "own": "66", "yield": "3200", "farmland": "lease_mortgage, own",
-             "number_of_goats": "3", "business_type": "kachamal"}]
+             "loan_amount": "20000", "decimal_own": "66", "yield": "80", "ownership": "lease_mortgage, own",
+             "number_of_goats": "3", "business_type": "foriya"}]
     cells = {c["field"]: c for c in compare(pred, truth, schema)}
-    assert cells["loan_amount"]["status"] == "match"
-    assert cells["own"]["status"] == "mismatch"
-    assert cells["yield"]["status"] == "mismatch" and cells["yield"]["note"].startswith("x40")
-    assert cells["farmland"]["status"] == "match"           # order-insensitive
-    assert "number_of_goats" not in cells                   # column absent from that sheet's form version
-    assert "number_of_cows" in cells and cells["number_of_cows"]["status"] == "missed"
+    assert cells["loan_amount"]["status"] == "match" and cells["yield"]["status"] == "match"   # maund on both sides
+    assert cells["decimal_own"]["status"] == "mismatch"
+    assert cells["ownership"]["status"] == "match"                  # order-insensitive
+    assert "number_of_goats" not in cells                           # column absent from that sheet
+    assert cells["number_of_cows"]["status"] == "missed" and cells["business_type"]["status"] == "mismatch"
     assert "recall" in summarize(list(cells.values()), 1)
 
 
@@ -394,7 +475,7 @@ class StubExtractor:
             {"transcript": [{"speaker": "CEX", "time": "00:00:07", "text": "as salam oa alaikum."}],
              "call_assessment": {"audio_quality": "good", "is_kyc_call": True, "respondent_is_farmer": "yes",
                                  "language_note": ""},
-             "fields": [item("loan_amount", "40,000"), item("own", "16.5", "low")],
+             "fields": [item("loan_amount", "40,000"), item("smartphone_ownership", "both", "low")],
              "notes": "Farmer loan nibe.", "eng_notes": "Farmer wants a loan.", "warnings": ["w1"]},
             {"prompt_tokens": 10, "output_tokens": 5}, "m1", "ey-0")
 
@@ -415,11 +496,11 @@ def test_worker_saves_result_and_marks_done(schema):
     assert w.process(db.claim_next()) == "done"
     r = db.results[0]
     assert r["call_id"] == "id1" and r["model"] == "m1" and r["usage"]["key"] == "ey-0"
-    assert r["fields"] == {"loan_amount": "40000", "own": "16.5"}          # normalised; notes not in fields
+    assert r["fields"] == {"loan_amount": "40000", "smartphone_ownership": "both"}   # normalised; notes not in fields
     assert r["transcript_text"] == "CEX: as salam oa alaikum. (00:00:07)\n"
     assert r["notes"] == "Farmer loan nibe." and r["eng_notes"] == "Farmer wants a loan."
-    assert {i["kind"] for i in r["review"]} == {"low_confidence", "warning"}
-    assert r["evidence"]["own"]["confidence"] == "low"
+    assert {i["kind"] for i in r["review"]} == {"low_confidence", "warning", "missing_required"}
+    assert r["evidence"]["smartphone_ownership"]["confidence"] == "low"
     patch = db.updates[-1][1]
     assert patch["status"] == "done" and patch["model"] == "m1" and patch["error"] is None
 

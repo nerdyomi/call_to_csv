@@ -92,7 +92,7 @@ def rebuild(settings: Settings, schema: Schema | None = None) -> int:
     """
     schema = schema or load_schema(settings.schema_path)
     manifest = load_manifest(settings.manifest)
-    manifest_cols = {f.name for f in schema.fields if f.source == "manifest"}
+    manifest_cols = {f.name for f in schema.fields if f.source in ("meta", "manifest")}
 
     results: dict[str, tuple[CallRow, dict[str, str]]] = {}
     for raw_file in sorted(settings.output_dir.glob("*/raw.json")):

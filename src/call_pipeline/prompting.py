@@ -14,12 +14,19 @@ def build_system_prompt(settings: Settings, schema: Schema) -> str:
     base = settings.system_prompt_path.read_text(encoding="utf-8").strip()
     if settings.include_transcript:
         base += "\n\n" + settings.transcript_prompt_path.read_text(encoding="utf-8").strip()
-    return f"{base}\n\n# FORM FIELDS\n\nOnly use these field names in `fields`.\n\n{schema.catalog_text()}\n"
+    form = (
+        f"# THE FORM (KYC Verification, version {schema.form_version})\n\n"
+        "Each line is one question: `key` [type, required?] the Bangla question | answer options (code=Bangla label) | "
+        "the condition under which the question applies | a note. Questions are listed in the order the agent asks them. "
+        "Only use these keys in `fields`.\n\n"
+        f"{schema.catalog_text()}\n"
+    )
+    return f"{base}\n\n{form}"
 
 
 def build_response_schema(schema: Schema, include_transcript: bool = True) -> dict:
     """JSON schema for Gemini structured output. Sparse: only filled fields are returned."""
-    field_names = [f.name for f in schema.audio_fields if f.name not in ("Notes", "eng_notes")]
+    field_names = [f.name for f in schema.question_fields]
     transcript = {
         "type": "array",
         "items": {
