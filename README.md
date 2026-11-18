@@ -85,3 +85,17 @@ npx tsx --env-file=.env.local scripts/live_ai_check.ts   # live Groq check on a 
 ```
 
 Evaluation itself is done by the Python worker, which must be running (`python -m call_pipeline worker`). Database changes live in `supabase/` (`schema.sql`, then `migrations/`).
+
+## How extraction is controlled (form-driven)
+
+The AI works from the real KYC form export, not from a hand-written field list.
+
+| What | Where |
+|---|---|
+| Questions, Bangla wording, answer options, required flags, "ask only if" rules | `config/form/kyc_verification_v65_published.json` (replace with a newer export to upgrade) |
+| Which form file is used, metadata columns, per-question hints and type overrides, old-sheet mapping for `evaluate` | `config/schema.yaml` |
+| General rules (units, land, yield in maund, whose data, confidence) | `prompts/system_prompt.md` |
+| Transcript rules | `prompts/transcript_section.md` |
+| Rules applied after the AI answers (drop answers the form would not ask, option codes, land calculation) | `src/call_pipeline/rules.py`, `normalize.py` |
+
+After editing the form, hints or prompts: restart the worker, then re-evaluate a call. When a new form export arrives run `python scripts/export_form_labels.py` so the website shows the new Bangla questions.
