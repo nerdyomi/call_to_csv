@@ -93,7 +93,11 @@ export const btn = {
 };
 
 export function Confidence({ level }: { level: string }) {
-  const cls = level === "high" ? "bg-emerald-50 text-emerald-700" : level === "medium" ? "bg-amber-50 text-amber-800" : "bg-red-50 text-red-700";
+  const cls =
+    level === "high" ? "bg-emerald-50 text-emerald-700"
+    : level === "medium" ? "bg-amber-50 text-amber-800"
+    : level === "calculated" ? "bg-slate-100 text-slate-600"
+    : "bg-red-50 text-red-700";
   return <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${cls}`}>{level}</span>;
 }
 

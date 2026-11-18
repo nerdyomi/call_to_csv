@@ -16,7 +16,7 @@ export interface Filter {
   value?: string | number | string[];
 }
 
-const KEY_FIELDS = ["loan_amount", "current_landsize", "own", "lease_mortgage", "number_of_dependents", "monthly_expenses"];
+const KEY_FIELDS = ["project_sub_type", "loan_amount", "current_landsize", "calc_land_own_decimals", "number_of_dependents", "monthly_expenses"];
 
 export function rowRef(r: Row): string {
   return `${r.phone}|${r.date ?? "none"}${r.seq > 1 ? `(${r.seq})` : ""}`;
@@ -187,5 +187,5 @@ Rules:
 - For any count, total, average, list or comparison you MUST call a tool; never compute or guess from memory. Tools return exact numbers.
 - Only state what the tool results show. If nothing matches, say so. Mention how many calls were considered.
 - Refer to calls as phone and date, e.g. 8801762709049 (2026-11-01).
-- Land is in decimals (shotok), money in BDT, yield in kg. Field values are stored as text numbers.
+- Field names are the keys of the KYC form. Land: current_landsize and *_land_size are in decimals (shotok); <unit>_own / <unit>_lease_mortgage are in the farmer's own unit; the calc_land_* fields are calculated decimals. Money is in BDT; yield is in maund and unit prices are per maund. Option fields hold codes (e.g. project_sub_type = Livestock). Field values are stored as text numbers.
 - Reply in Bangla (Bengali script), short and clear; keep numbers, phone numbers and field names as they are. The user may write in Bangla, Banglish or English.`;

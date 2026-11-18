@@ -2,27 +2,30 @@
 
 import { Card } from "@/components/ui";
 import { fmtDateTime } from "@/lib/format";
+import { valueLabel } from "@/lib/formLabels";
 import type { Call, CallResult } from "@/lib/types";
 
 const FACTS: [string, string][] = [
+  ["project_sub_type", "Loan for"],
   ["loan_amount", "Loan wanted (BDT)"],
-  ["current_landsize", "Land cultivated (decimals)"],
-  ["own", "Own land (decimals)"],
-  ["lease_mortgage", "Leased / mortgaged (decimals)"],
-  ["invest", "Investment (BDT)"],
-  ["yield", "Yield (kg)"],
-  ["unit_price", "Unit price (BDT)"],
-  ["number_of_dependents", "Dependents"],
+  ["current_landsize", "Land to cultivate (decimals)"],
+  ["calc_land_own_decimals", "Own land (decimals, calculated)"],
+  ["calc_land_lease_decimals", "Leased / mortgaged (decimals, calculated)"],
+  ["invest", "Season cost (BDT)"],
+  ["yield", "Last harvest (maund)"],
+  ["unit_price", "Price per maund (BDT)"],
+  ["number_of_dependents", "Household members"],
+  ["number_of_earning_members", "Earning members"],
   ["monthly_expenses", "Monthly expenses (BDT)"],
   ["current_loan_count", "Farmer's running loans"],
   ["current_spouse_loan_count", "Spouse's running loans"],
-  ["income_from_agriculture", "Yearly farm income (BDT)"],
   ["income_from_business", "Yearly business income (BDT)"],
 ];
 
 const KIND_LABEL: Record<string, string> = {
   low_confidence: "Low confidence", warning: "Warning", invalid_value: "Invalid value",
   unknown_code: "New value", duplicate: "Duplicate", not_in_schema: "Unknown field",
+  invalid_option: "Not an option", not_applicable: "Not asked for this loan", missing_gate: "Loan type unclear", missing_required: "Unanswered questions",
 };
 
 export default function SummaryTab({ call, result }: { call: Call; result: CallResult }) {
@@ -48,12 +51,12 @@ export default function SummaryTab({ call, result }: { call: Call; result: CallR
               {facts.map(([k, label]) => (
                 <div key={k} className="rounded-xl bg-slate-50 p-3">
                   <dt className="text-xs text-slate-500">{label}</dt>
-                  <dd className="mt-0.5 text-lg font-semibold tabular-nums">{Number(result.fields[k]).toLocaleString("en-US") === "NaN" ? result.fields[k] : Number(result.fields[k]).toLocaleString("en-US")}</dd>
+                  <dd className="mt-0.5 text-lg font-semibold tabular-nums">{Number.isNaN(Number(result.fields[k])) ? valueLabel(k, result.fields[k]) : Number(result.fields[k]).toLocaleString("en-US")}</dd>
                 </div>
               ))}
             </dl>
           )}
-          <p className="mt-3 text-xs text-slate-400">{Object.keys(result.fields).length} fields were filled in total — see the “Fields” tab.</p>
+          <p className="mt-3 text-xs text-slate-400">{Object.keys(result.fields).length} questions were answered in total — see the “Fields” tab.</p>
         </Card>
       </div>
 

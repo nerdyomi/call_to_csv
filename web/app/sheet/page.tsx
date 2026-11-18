@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { btn, StatusChip } from "@/components/ui";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { questionLabel } from "@/lib/formLabels";
 import { applyFilters, type Filter, type Row } from "@/lib/tools";
 import type { CallStatus } from "@/lib/types";
 
@@ -14,8 +15,9 @@ interface SheetRow extends Row {
 }
 
 const DEFAULT_COLS = [
-  "loan_amount", "current_landsize", "own", "lease_mortgage", "yield", "unit_price", "number_of_dependents",
-  "monthly_expenses", "current_loan_count", "current_spouse_loan_count", "income_from_agriculture", "income_from_business",
+  "project_sub_type", "item_name_crops", "loan_amount", "current_landsize", "calc_land_own_decimals", "calc_land_lease_decimals",
+  "yield", "unit_price", "number_of_dependents", "monthly_expenses", "current_loan_count", "current_spouse_loan_count",
+  "income_from_business",
 ];
 const OPS: [string, string][] = [
   ["eq", "is"], ["neq", "is not"], ["gt", ">"], ["gte", "≥"], ["lt", "<"], ["lte", "≤"],
@@ -92,7 +94,7 @@ export default function SheetPage() {
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE));
 
   const head = (col: string, label: string) => (
-    <th key={col} className="cursor-pointer select-none whitespace-nowrap px-3 py-2 hover:text-slate-800" onClick={() => setSort((s) => ({ col, dir: s.col === col ? (s.dir === 1 ? -1 : 1) : 1 }))}>
+    <th key={col} title={questionLabel(col)} className="cursor-pointer select-none whitespace-nowrap px-3 py-2 hover:text-slate-800" onClick={() => setSort((s) => ({ col, dir: s.col === col ? (s.dir === 1 ? -1 : 1) : 1 }))}>
       {label} {sort.col === col ? (sort.dir === 1 ? "▲" : "▼") : ""}
     </th>
   );

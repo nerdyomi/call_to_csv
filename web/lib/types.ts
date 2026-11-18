@@ -27,7 +27,7 @@ export interface TranscriptTurn {
   text: string;
 }
 export interface EvidenceItem {
-  confidence: "high" | "medium" | "low";
+  confidence: "high" | "medium" | "low" | "calculated";
   evidence: string;
   timestamp: string;
 }
