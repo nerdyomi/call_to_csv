@@ -54,6 +54,8 @@ class Schema:
     closed_enums: bool = False
     by_name: dict[str, Field] = field(default_factory=dict, compare=False)
     form_version: str = ""
+    truth_aliases: dict = field(default_factory=dict, compare=False)          # old CEX column -> form key (evaluate only)
+    truth_value_aliases: dict = field(default_factory=dict, compare=False)    # form key -> {old value: new value}
 
     @property
     def columns(self) -> list[str]:
@@ -162,4 +164,5 @@ def load_schema(path: Path) -> Schema:
     if len(set(names)) != len(names):
         raise ValueError(f"duplicate column names: {sorted({n for n in names if names.count(n) > 1})}")
     version = form.get("version", {}).get("number", "")
-    return Schema(tuple(fields), bool(cfg.get("closed_enums", True)), {f.name: f for f in fields}, str(version))
+    return Schema(tuple(fields), bool(cfg.get("closed_enums", True)), {f.name: f for f in fields}, str(version),
+                  dict(cfg.get("truth_aliases") or {}), dict(cfg.get("truth_value_aliases") or {}))

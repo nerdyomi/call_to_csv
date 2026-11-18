@@ -104,3 +104,15 @@ hint_patterns:
     hint: Selling price per MAUND (BDT).
   - match: '^income_from_'
     hint: YEARLY income in BDT. If he only gives a monthly amount, multiply by 12 and add a warning.
+
+# --------------------------------------------------------------------------------------------------
+# Only used by `evaluate`: how the OLD hand-filled CEX sheets name / write things compared with the form.
+# --------------------------------------------------------------------------------------------------
+truth_aliases:                    # old sheet column -> form key
+  farmland: ownership
+  own: calc_land_own_decimals
+  lease_mortgage: calc_land_lease_decimals
+  smart_phone_ownership: smartphone_ownership
+truth_value_aliases:              # form key -> {old value: form value}; an empty target drops that value
+  smartphone_ownership: {self: own, family: family_member}
+  individual_income_sources: {agriculture: ""}

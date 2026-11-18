@@ -613,3 +613,17 @@ def test_gemini_streaming_feeds_progress_callback(tmp_path):
     r = ex.extract(rec, "go", on_progress=seen.append)
     assert len(seen) == 2 and seen[-1].endswith("[]}") and r.data["notes"] == ""
     assert r.usage["output_tokens"] == 7 and r.usage["total_tokens"] == 13
+
+
+def test_old_sheets_are_translated_to_the_form_before_comparing(schema):
+    from call_pipeline.evaluate import compare, translate_truth
+    old = {"farmland": "own, lease_mortgage", "own": "16.5", "lease_mortgage": "132", "smart_phone_ownership": "family",
+           "individual_income_sources": "agriculture, business", "loan_amount": "40000"}
+    t = translate_truth(old, schema)
+    assert t["ownership"] == "own, lease_mortgage" and t["calc_land_own_decimals"] == "16.5"
+    assert t["calc_land_lease_decimals"] == "132" and t["smartphone_ownership"] == "family_member"
+    assert t["individual_income_sources"] == "business" and t["loan_amount"] == "40000"
+    pred = [{"Phone": "8801745196254", "_stem": "x", "ownership": "own, lease_mortgage", "calc_land_own_decimals": "16.5", "calc_land_lease_decimals": "132",
+             "smartphone_ownership": "family_member", "individual_income_sources": "business", "loan_amount": "40000"}]
+    cells = {c["field"]: c["status"] for c in compare(pred, {"1745196254": old}, schema)}
+    assert set(cells.values()) == {"match"} and "calc_land_lease_decimals" in cells

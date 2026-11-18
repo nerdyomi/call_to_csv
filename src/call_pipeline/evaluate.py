@@ -58,6 +58,21 @@ def load_truth(paths: list[Path]) -> dict[str, dict]:
     return out
 
 
+def translate_truth(row: dict, schema: Schema) -> dict:
+    """Old CEX sheet row -> form keys and form value words (see truth_aliases in config/schema.yaml)."""
+    out: dict[str, str] = {}
+    for col, val in row.items():
+        key = schema.truth_aliases.get(col, col)
+        if key in out and col != key:       # an explicit alias must not overwrite a column that already has the form's own name
+            continue
+        vmap = schema.truth_value_aliases.get(key)
+        if vmap and val:
+            parts = [p.strip() for p in re.split(r"[,;|]", val) if p.strip()]
+            val = ", ".join(x for x in (vmap.get(p, p) for p in parts) if x)
+        out[key] = val
+    return out
+
+
 def compare(pred_rows: list[dict], truth: dict[str, dict], schema: Schema,
             evidence: dict[tuple[str, str], dict] | None = None) -> list[dict]:
     evidence = evidence or {}
@@ -67,8 +82,9 @@ def compare(pred_rows: list[dict], truth: dict[str, dict], schema: Schema,
         t = truth.get(key)
         if t is None:
             continue
+        t = translate_truth(t, schema)
         rec = f"{pred.get('Started at', '')[:10]} {pred.get('Phone', '')}"
-        for f in schema.audio_fields:
+        for f in (x for x in schema.fields if x.source in ("audio", "derived")):
             if f.name in ("Notes", "eng_notes") or f.name not in t:
                 continue  # field not in that truth sheet's form version
             tv, pv = _canon(t[f.name], f.type), _canon(pred.get(f.name, ""), f.type)
