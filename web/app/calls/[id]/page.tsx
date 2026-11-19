@@ -69,12 +69,20 @@ export default function CallPage() {
   }, [active, loadCall, loadResult]);
   const now = useNow(!!active);
 
+  // the time button that started the current playback; pressing it again pauses
+  const [activeStamp, setActiveStamp] = useState<string | null>(null);
   function seek(t: string) {
     const el = audio.current;
     if (!el) return;
+    if (!el.paused && activeStamp === t) {
+      el.pause();
+      return;
+    }
     el.currentTime = hmsToSeconds(t);
+    setActiveStamp(t);
     el.play().catch(() => undefined);
   }
+  const playingStamp = playing ? activeStamp : null;
 
   async function evaluate() {
     if (!call) return;
@@ -112,12 +120,23 @@ export default function CallPage() {
       {call.status === "failed" && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800"><b>Evaluation failed:</b> {call.error}</div>}
 
       {audioUrl && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-          <audio
-            ref={audio} src={audioUrl} controls preload="metadata" className="w-full"
-            onTimeUpdate={(e) => setPlayhead(e.currentTarget.currentTime)}
-            onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-          />
+        // stays pinned under the top bar while you scroll, so pause / stop is always one tap away
+        <div className="sticky top-[3.7rem] z-20 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-md backdrop-blur">
+          <div className="flex items-center gap-3">
+            <audio
+              ref={audio} src={audioUrl} controls preload="metadata" className="min-w-0 flex-1"
+              onTimeUpdate={(e) => setPlayhead(e.currentTarget.currentTime)}
+              onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+              onEnded={() => setActiveStamp(null)}
+            />
+            <button
+              className={`${btn.secondary} shrink-0`} disabled={!playing}
+              onClick={() => audio.current?.pause()}
+              title="Pause the recording"
+            >
+              ⏸ Pause
+            </button>
+          </div>
         </div>
       )}
 
@@ -145,8 +164,8 @@ export default function CallPage() {
           </div>
 
           {tab === "summary" && <SummaryTab call={call} result={result} />}
-          {tab === "fields" && <FieldsTab result={result} onSeek={seek} />}
-          {tab === "conversation" && <ConversationTab result={result} playhead={playhead} playing={playing} onSeek={seek} />}
+          {tab === "fields" && <FieldsTab result={result} onSeek={seek} playingStamp={playingStamp} />}
+          {tab === "conversation" && <ConversationTab result={result} playhead={playhead} playing={playing} playingStamp={playingStamp} onSeek={seek} />}
           {tab === "behaviour" && <BehaviourTab callId={call.id} result={result} onSeek={seek} />}
           {tab === "chat" && (
             <ChatPanel

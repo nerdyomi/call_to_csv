@@ -26,7 +26,7 @@ const ROW_TINT: Record<string, string> = {
   medium: "border-l-amber-400 bg-amber-50/40",
 };
 
-export default function FieldsTab({ result, onSeek }: { result: CallResult; onSeek: (t: string) => void }) {
+export default function FieldsTab({ result, onSeek, playingStamp }: { result: CallResult; onSeek: (t: string) => void; playingStamp: string | null }) {
   const [q, setQ] = useState("");
   const [onlyReview, setOnlyReview] = useState(false);
   const [mode, setMode] = useState<Mode>("form");
@@ -101,7 +101,7 @@ export default function FieldsTab({ result, onSeek }: { result: CallResult; onSe
                     </td>
                     <td className="px-4 py-2">{r.ev ? <Confidence level={r.ev.confidence} /> : "–"}</td>
                     <td className="px-4 py-2">
-                      {r.ev?.timestamp ? <button className="font-mono text-xs text-emerald-700 hover:underline" onClick={() => onSeek(r.ev!.timestamp)} title="Play from here">▶ {r.ev.timestamp}</button> : "–"}
+                      {r.ev?.timestamp ? <button className="font-mono text-xs text-emerald-700 hover:underline" onClick={() => onSeek(r.ev!.timestamp)} title={playingStamp === r.ev.timestamp ? "Pause" : "Play from here"}>{playingStamp === r.ev.timestamp ? "⏸ pause" : `▶ ${r.ev.timestamp}`}</button> : "–"}
                     </td>
                     <td className="max-w-[420px] px-4 py-2 text-slate-600">{r.ev?.confidence === "calculated" && <span className="mr-1 text-xs font-medium text-slate-400">calculated:</span>}{r.ev?.evidence}</td>
                   </tr>

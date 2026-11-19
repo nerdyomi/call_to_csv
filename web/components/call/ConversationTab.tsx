@@ -10,8 +10,8 @@ const WHO: Record<string, { label: string; bubble: string; tag: string }> = {
   other: { label: "Other person", bubble: "bg-slate-50 border-slate-200", tag: "text-slate-600" },
 };
 
-export default function ConversationTab({ result, playhead, playing, onSeek }: {
-  result: CallResult; playhead: number; playing: boolean; onSeek: (t: string) => void;
+export default function ConversationTab({ result, playhead, playing, playingStamp, onSeek }: {
+  result: CallResult; playhead: number; playing: boolean; playingStamp: string | null; onSeek: (t: string) => void;
 }) {
   const [q, setQ] = useState("");
   const turns = result.transcript ?? [];
@@ -48,7 +48,7 @@ export default function ConversationTab({ result, playhead, playing, onSeek }: {
               <div className={`max-w-[85%] rounded-2xl border px-4 py-2 ${w.bubble} ${isActive ? "ring-2 ring-emerald-500" : ""}`}>
                 <div className="mb-0.5 flex items-center gap-2 text-xs">
                   <span className={`font-semibold ${w.tag}`}>{w.label}</span>
-                  <button className="font-mono text-slate-400 hover:text-emerald-700 hover:underline" onClick={() => onSeek(t.time)}>▶ {t.time}</button>
+                  <button className="font-mono text-slate-400 hover:text-emerald-700 hover:underline" onClick={() => onSeek(t.time)}>{playingStamp === t.time ? "⏸ pause" : `▶ ${t.time}`}</button>
                 </div>
                 <p className="text-[15px] leading-relaxed text-slate-800">{t.text}</p>
               </div>
