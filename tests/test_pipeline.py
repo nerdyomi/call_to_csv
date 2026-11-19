@@ -58,6 +58,7 @@ def test_system_prompt_carries_the_form(schema):
     assert "`decimals_per_bigha`" in p and "ask only if: project_sub_type = Livestock AND item_name_livestock = Cow" in p
     assert "Yield and price are in MAUND" in p and "yield fields are in **kg**" not in p
     assert "Answer with the option **code**" in p and "Follow the form's logic" in p
+    assert "Completeness on the questions that matter" in p and "marked `required`" in p
 
 
 @pytest.mark.parametrize("text,expected", [("40,000", "40000"), ("৫০,০০০", "50000"), ("16.50", "16.5"),
