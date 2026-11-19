@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { btn, StatusChip } from "@/components/ui";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { questionLabel } from "@/lib/formLabels";
+import { formOrder, questionLabel } from "@/lib/formLabels";
 import { applyFilters, type Filter, type Row } from "@/lib/tools";
 import type { CallStatus } from "@/lib/types";
 
@@ -14,6 +14,7 @@ interface SheetRow extends Row {
   model: string | null;
 }
 
+// a short, readable set the "default" link in the Columns picker falls back to
 const DEFAULT_COLS = [
   "project_sub_type", "item_name_crops", "loan_amount", "current_landsize", "calc_land_own_decimals", "calc_land_lease_decimals",
   "yield", "unit_price", "number_of_dependents", "monthly_expenses", "current_loan_count", "current_spouse_loan_count",
@@ -42,7 +43,7 @@ export default function SheetPage() {
   const [pickerQ, setPickerQ] = useState("");
   const [sort, setSort] = useState<{ col: string; dir: 1 | -1 }>({ col: "date", dir: -1 });
   const [page, setPage] = useState(0);
-  const [allColsExport, setAllColsExport] = useState(false);
+  const [allColsExport, setAllColsExport] = useState(true);
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
@@ -63,9 +64,10 @@ export default function SheetPage() {
   const fieldNames = useMemo(() => {
     const n = new Map<string, number>();
     rows.forEach((r) => Object.keys(r.fields).forEach((k) => n.set(k, (n.get(k) ?? 0) + 1)));
-    return [...n].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([k]) => k);
+    // every field any call has, in the order of the KYC form
+    return [...n].sort((a, b) => formOrder(a[0]) - formOrder(b[0]) || a[0].localeCompare(b[0])).map(([k]) => k);
   }, [rows]);
-  const cols = visible ?? DEFAULT_COLS.filter((c) => fieldNames.includes(c));
+  const cols = visible ?? fieldNames;
 
   const filtered = useMemo(() => {
     let out = rows.filter((r) => {
@@ -171,7 +173,7 @@ export default function SheetPage() {
             {pickerOpen && (
               <div className="absolute right-0 z-20 mt-2 w-72 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
                 <input value={pickerQ} onChange={(e) => setPickerQ(e.target.value)} placeholder="Find a field…" className="mb-2 w-full rounded-md border border-slate-300 px-2 py-1 text-sm" />
-                <div className="mb-2 flex gap-3 text-xs"><button className={btn.link} onClick={() => setVisible([])}>none</button><button className={btn.link} onClick={() => setVisible(fieldNames)}>all</button><button className={btn.link} onClick={() => setVisible(null)}>default</button></div>
+                <div className="mb-2 flex gap-3 text-xs"><button className={btn.link} onClick={() => setVisible([])}>none</button><button className={btn.link} onClick={() => setVisible(fieldNames)}>all</button><button className={btn.link} onClick={() => setVisible(DEFAULT_COLS.filter((c) => fieldNames.includes(c)))}>short list</button></div>
                 <div className="max-h-64 space-y-0.5 overflow-y-auto">
                   {fieldNames.filter((n) => n.includes(pickerQ.toLowerCase())).map((n) => (
                     <label key={n} className="flex items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-slate-50">
