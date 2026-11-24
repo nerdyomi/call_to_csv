@@ -99,3 +99,8 @@ The AI works from the real KYC form export, not from a hand-written field list.
 | Rules applied after the AI answers (drop answers the form would not ask, option codes, land calculation) | `src/call_pipeline/rules.py`, `normalize.py` |
 
 After editing the form, hints or prompts: restart the worker, then re-evaluate a call. When a new form export arrives run `python scripts/export_form_labels.py` so the website shows the new Bangla questions.
+
+## API status page
+
+`/apis` on the website lists every key in `.env` (`GEMINI_API_KEY`, `GEMINI_API_KEY_2`, `_3`, ... any number) as api1, api2, ..., with a model toggle that shows each model's price and free-tier facts and each key's status for it. Status is "last seen": the worker records the outcome of its real calls (working, busy, quota used up, key rejected), so no quota is spent on checks. Run `supabase/migrations/003_api_status.sql` once, restart the worker after changing keys. Prices and free-tier limits come from `config/pricing.yaml` (verify them). Keys are never sent anywhere; only the last 4 characters.
+

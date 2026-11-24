@@ -47,6 +47,7 @@ class Settings:
     main_csv: str
     review_csv: str
     evidence_csv: str
+    api_key_names: tuple[str, ...] = ()  # .env variable name of each key, same order as api_keys
 
     def call_dir(self, stem: str) -> Path:
         """output/<recording name>/ holds everything about one call."""
@@ -73,18 +74,21 @@ class Settings:
         return self.output_dir / "errors.jsonl"
 
 
-def _collect_api_keys() -> tuple[str, ...]:
-    """GEMINI_API_KEY, GEMINI_API_KEY_2, GEMINI_API_KEY_3 ... (blank and duplicate values are skipped)."""
+def _collect_api_keys() -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """GEMINI_API_KEY, GEMINI_API_KEY_2, GEMINI_API_KEY_3 ... (blank and duplicate values are skipped).
+    Returns (keys, the .env variable name of each key)."""
     found = []
     for name, value in os.environ.items():
         m = re.fullmatch(r"GEMINI_API_KEY(?:_(\d+))?", name)
         if m and value.strip():
-            found.append((int(m.group(1) or 1), value.strip()))
+            found.append((int(m.group(1) or 1), name, value.strip()))
     keys: list[str] = []
-    for _, value in sorted(found):
+    names: list[str] = []
+    for _, name, value in sorted(found):
         if value not in keys:
             keys.append(value)
-    return tuple(keys)
+            names.append(name)
+    return tuple(keys), tuple(names)
 
 
 def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settings:
@@ -93,7 +97,7 @@ def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settin
     p, a, f, m, r, o = (cfg[k] for k in ("paths", "audio", "filename", "model", "run", "output"))
     w = cfg.get("worker", {})
 
-    api_keys = _collect_api_keys()
+    api_keys, api_key_names = _collect_api_keys()
     if require_key and not api_keys:
         raise SystemExit("GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.")
     fallback_env = os.getenv("GEMINI_FALLBACK_MODELS")
@@ -106,6 +110,7 @@ def load_settings(root: Path = PROJECT_ROOT, require_key: bool = True) -> Settin
     return Settings(
         root=root,
         api_keys=api_keys,
+        api_key_names=api_key_names,
         model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip(),
         fallback_models=fallbacks,
         input_dir=path("input_dir"),

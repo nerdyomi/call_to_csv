@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/", label: "Calls" },
   { href: "/sheet", label: "All calls sheet" },
   { href: "/chat", label: "Ask AI (all calls)" },
+  { href: "/apis", label: "API status" },
 ];
 
 export default function Nav() {

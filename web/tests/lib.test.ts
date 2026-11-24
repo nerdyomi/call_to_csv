@@ -6,6 +6,7 @@ import { normalizeBehaviour, parseJson } from "../lib/behaviour";
 import { buildCallContext, estimateTokens } from "../lib/context";
 import { chatOnce, chatStream, stripThink } from "../lib/groq";
 import type { Call, CallResult } from "../lib/types";
+import { ago, quotaDay, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo } from "../lib/apiStatus";
 
 describe("recording file names", () => {
   it("reads phone and date from the CEX naming pattern", () => {
@@ -181,5 +182,49 @@ describe("ThinkFilter", () => {
     const { ThinkFilter } = await import("../lib/groq");
     const f = new ThinkFilter();
     expect(f.push("a < b and <th") + f.push("is> c") + f.flush()).toBe("a < b and <this> c");
+  });
+});
+
+
+const row = (p: Partial<KeyModelRow>): KeyModelRow => ({
+  provider: "gemini", slot: 1, model: "m", env_name: "GEMINI_API_KEY", key_tail: "abcd", status: "ok", detail: null,
+  last_ok_at: null, last_fail_at: null, last_seen_at: "2026-11-24T10:00:00Z", day: "2026-11-24", requests_today: 3, tokens_today: 900, ...p,
+});
+
+describe("shownStatus", () => {
+  it("is not used yet when nothing was seen", () => {
+    expect(shownStatus(undefined).tone).toBe("idle");
+    expect(shownStatus(row({ status: "unknown", last_seen_at: null })).label).toBe("Not used yet");
+  });
+  it("maps outcomes to plain labels", () => {
+    expect(shownStatus(row({ status: "ok" })).tone).toBe("good");
+    expect(shownStatus(row({ status: "busy" })).tone).toBe("warn");
+    expect(shownStatus(row({ status: "key_rejected" })).tone).toBe("bad");
+    expect(shownStatus(row({ status: "unavailable" })).label).toBe("Model not available");
+  });
+  it("a quota from an earlier day is only 'may have reset'", () => {
+    expect(shownStatus(row({ status: "quota", day: "2026-11-24" }), "2026-11-24").label).toBe("Daily quota used up");
+    expect(shownStatus(row({ status: "quota", day: "2026-11-23" }), "2026-11-24").label).toBe("Quota may have reset");
+  });
+});
+
+describe("helpers", () => {
+  it("counts usage only for today's quota day", () => {
+    expect(usedToday(row({}), "2026-11-24")).toEqual({ requests: 3, tokens: 900 });
+    expect(usedToday(row({}), "2026-11-25")).toEqual({ requests: 0, tokens: 0 });
+  });
+  it("quota day follows Pacific time", () => {
+    expect(quotaDay(new Date("2026-11-24T03:00:00Z"))).toBe("2026-11-23");
+    expect(quotaDay(new Date("2026-11-24T12:00:00Z"))).toBe("2026-11-24");
+  });
+  it("formats time since", () => {
+    const now = Date.parse("2026-11-24T12:00:00Z");
+    expect(ago("2026-11-24T11:58:00Z", now)).toBe("2 min ago");
+    expect(ago(null, now)).toBe("never");
+  });
+  it("estimates the cost of one call, or says it cannot", () => {
+    const m = { input_per_m: 1, audio_per_m: 1, output_per_m: 1 } as ModelInfo;
+    expect(typicalCallCost(m, 100, 1000, 1000)).toBeCloseTo((3200 + 1000 + 1000) / 1e6);
+    expect(typicalCallCost({ ...m, audio_per_m: null })).toBeNull();
   });
 });

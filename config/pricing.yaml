@@ -31,6 +31,23 @@ models:
     audio_input: 1.25
     output: 10.00
 
+# Shown on the website's API status page. null = not known: look it up in Google AI Studio (aistudio.google.com).
+# Free-tier limits are per model and per project (all keys of one project share them) and Google changes them,
+# so treat every number here as "verify". rpd = requests per day, rpm = per minute, tpm = tokens per minute.
+free_tier:
+  gemini-3.8-flash:
+    {available: true, rpd: 20, rpm: null, tpm: null, note: "20 requests/day per project seen in real use; a request counts as 1 whatever its size"}
+  gemini-3.6-flash:
+    {available: true, rpd: 20, rpm: null, tpm: null, note: "20 requests/day per project seen in real use"}
+  gemini-3.5-flash-lite:
+    {available: null, rpd: null, rpm: null, tpm: null, note: "free-tier limits not checked yet"}
+  gemini-2.5-flash:
+    {available: false, rpd: null, rpm: null, tpm: null, note: "returned 'no longer available to new users' for new projects"}
+  gemini-2.5-flash-lite:
+    {available: null, rpd: null, rpm: null, tpm: null, note: "free-tier limits not checked yet"}
+  gemini-2.5-pro:
+    {available: null, rpd: null, rpm: null, tpm: null, note: "free-tier limits not checked yet"}
+
 # Typical output size per call, used only for the forecast (no API needed).
 # Replace with real numbers from output/usage.jsonl after your first runs.
 assumed_output_tokens_per_call: 6000

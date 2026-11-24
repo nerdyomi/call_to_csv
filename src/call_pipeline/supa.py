@@ -46,6 +46,20 @@ class Supa:
                                    headers={"Prefer": "resolution=merge-duplicates,return=minimal"}),
                     "save call_results")
 
+    def select(self, table: str, query: str) -> list[dict]:
+        return self._check(self.http.get(f"{self.base}/rest/v1/{table}?{query}"), f"select {table}").json()
+
+    def upsert(self, table: str, rows: list[dict], on_conflict: str) -> None:
+        """Insert or update many rows (every row must have the same keys)."""
+        if rows:
+            self._check(self.http.post(f"{self.base}/rest/v1/{table}?on_conflict={on_conflict}", json=rows,
+                                       headers={"Prefer": "resolution=merge-duplicates,return=minimal"}),
+                        f"upsert {table}")
+
+    def delete(self, table: str, query: str) -> None:
+        self._check(self.http.delete(f"{self.base}/rest/v1/{table}?{query}", headers={"Prefer": "return=minimal"}),
+                    f"delete {table}")
+
     def download(self, storage_path: str, bucket: str = "recordings") -> bytes:
         url = f"{self.base}/storage/v1/object/{bucket}/{quote(storage_path, safe='/')}"
         return self._check(self.http.get(url), f"download {storage_path}").content

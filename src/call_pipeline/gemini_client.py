@@ -118,9 +118,11 @@ def _usage_dict(resp) -> dict:
 
 class GeminiExtractor:
     def __init__(self, settings: Settings, system_prompt: str, response_schema: dict,
-                 clients: list | None = None, client=None):
-        """`clients` (one per API key, same order) lets tests inject fakes; normally built from settings."""
+                 clients: list | None = None, client=None, on_event=None):
+        """`clients` (one per API key, same order) lets tests inject fakes; normally built from settings.
+        `on_event(key_index, model, kind, detail, tokens)` reports every outcome (used by the API status page)."""
         self.s = settings
+        self.on_event = on_event
         self.system_prompt = system_prompt
         self.response_schema = response_schema
         provided = clients if clients is not None else ([client] if client is not None else None)
@@ -153,6 +155,18 @@ class GeminiExtractor:
             why = [f"key ...{self.tails[k]}: {r}" for k, r in self._dead_keys.items()]
             why += [f"{m} on key ...{self.tails[k]}: {r}" for (m, k), r in self._dead_pairs.items()]
         return "no usable Gemini key/model left - " + "; ".join(why)
+
+    _STATUS = {"retry": "busy", "quota": "quota", "key": "key_rejected", "model": "unavailable"}
+
+    def _emit(self, k: int, model: str, kind: str, exc: Exception | None = None, tokens: int = 0) -> None:
+        """Tell the status page what happened; reporting must never break an extraction."""
+        if not self.on_event:
+            return
+        try:
+            self.on_event(k, "*" if kind == "key" else model, self._STATUS.get(kind, kind),
+                          str(exc)[:160].strip() if exc else "", tokens)
+        except Exception:
+            log.debug("status event failed", exc_info=True)
 
     def _drop(self, kind: str, model: str, k: int, exc: Exception) -> None:
         reason = f"{kind} ({str(exc)[:110].strip()})"
@@ -225,6 +239,7 @@ class GeminiExtractor:
                     if kind == "fatal":
                         raise
                     last = exc
+                    self._emit(k, model, kind, exc)
                     if kind != "retry":
                         self._drop(kind, model, k, exc)
                     continue
@@ -235,12 +250,16 @@ class GeminiExtractor:
                         text = resp.text
                         if not text:
                             raise json.JSONDecodeError("empty response (blocked or truncated)", "", 0)
-                        return GeminiResult(json.loads(text), _usage_dict(resp), model, self.tails[k])
+                        usage = _usage_dict(resp)
+                        result = GeminiResult(json.loads(text), usage, model, self.tails[k])
+                        self._emit(k, model, "ok", tokens=usage.get("total_tokens") or 0)
+                        return result
                     except Exception as exc:
                         last = exc
                         kind, delay = classify(exc, self.s.retry_base_seconds * 2 ** attempt)
                         if kind == "fatal":
                             raise
+                        self._emit(k, model, kind, exc)
                         if kind != "retry":
                             self._drop(kind, model, k, exc)
                             break

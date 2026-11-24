@@ -67,7 +67,14 @@ def main(argv: list[str] | None = None) -> None:
         system_prompt, response_schema = build_system_prompt(s, schema), build_response_schema(schema, s.include_transcript)
         print(f"Worker started: {len(s.api_keys)} Gemini key(s), models {', '.join(s.models)}, "
               f"{s.workers} parallel call(s). {'Processing the queue once.' if args.once else 'Ctrl+C to stop.'}")
-        Worker(Supa(s), lambda: GeminiExtractor(s, system_prompt, response_schema), schema, s).run(once=args.once)
+        from .apistatus import StatusReporter
+        db = Supa(s)
+        reporter = StatusReporter(db, s)   # feeds the website's "API status" page; costs no API quota
+        reporter.start()
+        try:
+            Worker(db, lambda: GeminiExtractor(s, system_prompt, response_schema, on_event=reporter.event), schema, s).run(once=args.once)
+        finally:
+            reporter.stop()
     elif args.cmd == "rebuild":
         s = load_settings(require_key=False)
         print(f"{pipeline.rebuild(s)} rows written to {s.output_dir / s.main_csv}")
