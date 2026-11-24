@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import UploadPanel from "@/components/UploadPanel";
+import ModelPicker, { useModelChoice } from "@/components/ModelPicker";
 import { btn, CallProgress, queueCall, StatusChip, useNow } from "@/components/ui";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { callLabel, fmtDateTime, fmtDuration } from "@/lib/format";
@@ -52,16 +53,18 @@ export default function CallsPage() {
   const queuedSince = calls.filter((c) => c.status === "queued").map((c) => new Date(c.queued_at ?? c.created_at).getTime());
   const workerIdle = queuedSince.length > 0 && !calls.some((c) => c.status === "processing") && now - Math.min(...queuedSince) > 45000;
 
+  const [modelChoice, setModelChoice] = useModelChoice();
+
   async function evaluate(c: Call) {
     if (c.status === "done" && !confirm("This call is already evaluated. Evaluate it again and replace the results?")) return;
-    const err = await queueCall(sb, c.id);
+    const err = await queueCall(sb, c.id, modelChoice);
     if (err) setNote(`Could not start: ${err.message}`);
     else setCalls((cur) => cur.map((x) => (x.id === c.id ? { ...x, status: "queued", progress: 0, stage: null, error: null } : x)));
   }
 
   async function evaluateAll() {
     const todo = calls.filter((c) => c.status === "uploaded");
-    for (const c of todo) await queueCall(sb, c.id);
+    for (const c of todo) await queueCall(sb, c.id, modelChoice);
     load();
   }
 
@@ -118,6 +121,7 @@ export default function CallsPage() {
             value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search phone, date or file…"
             className="ml-auto w-60 rounded-lg border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-emerald-500"
           />
+          <ModelPicker value={modelChoice} onChange={setModelChoice} />
           <button className={btn.primary} disabled={counts.uploaded === 0} onClick={evaluateAll}>
             Evaluate all not evaluated ({counts.uploaded})
           </button>

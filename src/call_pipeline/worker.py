@@ -122,7 +122,9 @@ class Worker:
                 duration = audio.duration_seconds(path)
                 prog.duration = duration
                 prog.set("thinking", 8)
-                res = self._get_extractor().extract(rec, USER_INSTRUCTION, on_progress=prog.on_text)
+                pick = (call.get("requested_model") or "").strip()   # model chosen on the website ("" = Auto)
+                extra = {"models": [pick]} if pick else {}
+                res = self._get_extractor().extract(rec, USER_INSTRUCTION, on_progress=prog.on_text, **extra)
         except QuotaExhausted as exc:
             # not the call's fault: keep it in the queue and wait for the quota to come back
             self.db.update_call(cid, {"status": "queued", "queued_at": _now(), "error": str(exc)[:500],

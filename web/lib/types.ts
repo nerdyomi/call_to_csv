@@ -15,6 +15,7 @@ export interface Call {
   error: string | null;
   attempts: number;
   model: string | null;
+  requested_model?: string | null; // exists after migration 004
   queued_at: string | null;
   started_at: string | null;
   finished_at: string | null;

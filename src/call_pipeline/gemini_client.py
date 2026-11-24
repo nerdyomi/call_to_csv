@@ -141,9 +141,9 @@ class GeminiExtractor:
         self._uploads: dict = {}
 
     # ---- availability bookkeeping ------------------------------------------------------------
-    def _available(self) -> list[tuple[str, int]]:
+    def _available(self, models: list[str] | None = None) -> list[tuple[str, int]]:
         with self._lock:
-            return [(m, k) for m in self.models for k in range(len(self.clients))
+            return [(m, k) for m in (models or self.models) for k in range(len(self.clients))
                     if k not in self._dead_keys and (m, k) not in self._dead_pairs]
 
     @property
@@ -224,12 +224,13 @@ class GeminiExtractor:
                 usage = chunk.usage_metadata
         return SimpleNamespace(text=text, usage_metadata=usage)
 
-    def extract(self, rec: Recording, instruction: str, on_progress=None) -> GeminiResult:
-        """`on_progress(text_so_far)`: when given, the answer is streamed and the callback sees the growing JSON text."""
+    def extract(self, rec: Recording, instruction: str, on_progress=None, models: list[str] | None = None) -> GeminiResult:
+        """`on_progress(text_so_far)`: when given, the answer is streamed and the callback sees the growing JSON text.
+        `models`: use only these models (a model picked on the website) instead of the main model + backups."""
         uploads: dict[int, object] = {}
         last: Exception | None = None
         try:
-            for model, k in self._available():
+            for model, k in self._available(models):
                 if k in self._dead_keys or (model, k) in self._dead_pairs:
                     continue  # another thread dropped it meanwhile
                 try:
@@ -276,6 +277,9 @@ class GeminiExtractor:
                     self.clients[k].files.delete(name=up.name)
                 except Exception:  # best effort; files expire on their own after 48h
                     log.warning("could not delete uploaded file for %s", rec.name)
+        if models:   # the user picked this model: say so instead of quietly using another one
+            why = f": {str(last)[:200]}" if last else ""
+            raise RuntimeError(f"The chosen model ({', '.join(models)}) could not be used on any API key{why}. Try Auto or another model.")
         stop = self.quota_exhausted
         if stop:
             raise QuotaExhausted(stop)

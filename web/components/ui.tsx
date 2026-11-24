@@ -101,10 +101,23 @@ export function Confidence({ level }: { level: string }) {
   return <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${cls}`}>{level}</span>;
 }
 
-/** Queues a call for the worker. Falls back gracefully when migration 002 (progress columns) has not been run. */
-export async function queueCall(sb: ReturnType<typeof import("@/lib/supabase/client").supabaseBrowser>, id: string) {
+/** Queues a call for the worker. `model` = the model picked on the page ("" / null = Auto).
+ *  Falls back gracefully when migration 002 (progress columns) or 004 (model choice) has not been run. */
+export async function queueCall(sb: ReturnType<typeof import("@/lib/supabase/client").supabaseBrowser>, id: string, model?: string | null) {
   const base = { status: "queued", queued_at: new Date().toISOString(), error: null };
-  let { error } = await sb.from("calls").update({ ...base, progress: 0, stage: null }).eq("id", id);
-  if (error) ({ error } = await sb.from("calls").update(base).eq("id", id));
+  const pick = model || null;
+  const tries: Record<string, unknown>[] = [
+    { ...base, progress: 0, stage: null, requested_model: pick },
+    { ...base, requested_model: pick },
+    { ...base, progress: 0, stage: null },
+    base,
+  ];
+  let error: { message: string } | null = null;
+  for (const patch of tries) {
+    // a model that was picked must never be silently ignored
+    if (pick && !("requested_model" in patch)) return { message: "Choosing a model needs supabase/migrations/004_requested_model.sql to be run first." };
+    ({ error } = await sb.from("calls").update(patch).eq("id", id));
+    if (!error) return null;
+  }
   return error;
 }

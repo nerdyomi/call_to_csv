@@ -152,3 +152,28 @@ def test_a_failing_status_callback_never_breaks_extraction(tmp_path):
         raise RuntimeError("status page down")
     ex = GeminiExtractor(s, "sys", {"type": "object"}, clients=[_client(lambda m: None)], on_event=boom)
     assert ex.extract(audio.Recording(f), "go").model == "m1"
+
+
+# ---- a model picked on the website is used on its own ----
+
+def test_chosen_model_is_used_alone_and_failure_says_so(tmp_path):
+    import pytest
+    from google.genai import errors
+    f = tmp_path / "a.mp3"
+    f.write_bytes(b"x")
+    s = replace(load_settings(require_key=False), requests_per_minute=60000, retry_base_seconds=0, max_retries=0,
+                api_keys=("k0",), model="m1", fallback_models=("m2",))
+    seen = []
+
+    def behave(m):
+        seen.append(m)
+        return None
+
+    ex = GeminiExtractor(s, "sys", {"type": "object"}, clients=[_client(behave)])
+    assert ex.extract(audio.Recording(f), "go", models=["m2"]).model == "m2"
+    assert seen == ["m2"]                                    # m1 was never tried
+
+    busy = errors.ServerError(503, {"error": {"code": 503, "message": "overloaded", "status": "UNAVAILABLE"}})
+    ex = GeminiExtractor(s, "sys", {"type": "object"}, clients=[_client(lambda m: busy if m == "m2" else None)])
+    with pytest.raises(RuntimeError, match="chosen model .*m2.* Try Auto"):
+        ex.extract(audio.Recording(f), "go", models=["m2"])   # does not quietly use m1 instead

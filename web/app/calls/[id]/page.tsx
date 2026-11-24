@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatPanel from "@/components/ChatPanel";
+import ModelPicker, { useModelChoice } from "@/components/ModelPicker";
 import BehaviourTab from "@/components/call/BehaviourTab";
 import ConversationTab from "@/components/call/ConversationTab";
 import FieldsTab from "@/components/call/FieldsTab";
@@ -84,10 +85,14 @@ export default function CallPage() {
   }
   const playingStamp = playing ? activeStamp : null;
 
+  const [modelChoice, setModelChoice] = useModelChoice();
+  const [startError, setStartError] = useState<string | null>(null);
+
   async function evaluate() {
     if (!call) return;
     if (result && !confirm("This call is already evaluated. Evaluate it again and replace the results?")) return;
-    const err = await queueCall(sb, call.id);
+    const err = await queueCall(sb, call.id, modelChoice);
+    setStartError(err ? err.message : null);
     if (!err) setCall({ ...call, status: "queued", progress: 0, stage: null, error: null });
   }
 
@@ -101,7 +106,8 @@ export default function CallPage() {
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold">{callLabel(call)}</h1>
           <StatusChip status={call.status} />
-          <div className="ml-auto flex gap-2">
+          <div className="ml-auto flex items-center gap-3">
+            {call.status !== "queued" && call.status !== "processing" && <ModelPicker value={modelChoice} onChange={setModelChoice} />}
             {(call.status === "uploaded" || call.status === "failed") && <button className={btn.primary} onClick={evaluate}>{call.status === "failed" ? "Retry evaluation" : "Evaluate"}</button>}
             {call.status === "done" && <button className={btn.secondary} onClick={evaluate}>Re-evaluate</button>}
           </div>
@@ -111,6 +117,7 @@ export default function CallPage() {
         </p>
       </div>
 
+      {startError && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">Could not start: {startError}</div>}
       {active && (
         <Card title="Evaluation in progress">
           <CallProgress call={call} now={now} />
