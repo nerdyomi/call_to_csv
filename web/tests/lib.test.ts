@@ -6,7 +6,7 @@ import { normalizeBehaviour, parseJson } from "../lib/behaviour";
 import { buildCallContext, estimateTokens } from "../lib/context";
 import { chatOnce, chatStream, stripThink } from "../lib/groq";
 import type { Call, CallResult } from "../lib/types";
-import { ago, quotaDay, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo } from "../lib/apiStatus";
+import { ago, resetInfo, quotaDay, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo } from "../lib/apiStatus";
 
 describe("recording file names", () => {
   it("reads phone and date from the CEX naming pattern", () => {
@@ -226,5 +226,16 @@ describe("helpers", () => {
     const m = { input_per_m: 1, audio_per_m: 1, output_per_m: 1 } as ModelInfo;
     expect(typicalCallCost(m, 100, 1000, 1000)).toBeCloseTo((3200 + 1000 + 1000) / 1e6);
     expect(typicalCallCost({ ...m, audio_per_m: null })).toBeNull();
+  });
+});
+
+describe("stale busy and reset time", () => {
+  it("a busy status from long ago is not shown as busy now", () => {
+    const r = row({ status: "busy", last_seen_at: "2026-11-24T07:41:00Z" });
+    expect(shownStatus(r, "2026-11-24", Date.parse("2026-11-24T07:45:00Z")).label).toBe("Busy");
+    expect(shownStatus(r, "2026-11-24", Date.parse("2026-11-24T12:00:00Z")).label).toBe("Was busy earlier");
+  });
+  it("tells how long until the Pacific-time reset, with the Bangladesh clock time", () => {
+    expect(resetInfo(new Date("2026-11-24T07:46:00Z"))).toBe("in 0 h 14 min (2:00 pm Bangladesh time)");
   });
 });

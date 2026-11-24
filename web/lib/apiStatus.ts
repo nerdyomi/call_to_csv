@@ -38,7 +38,23 @@ export function quotaDay(now: Date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 }
 
-export function shownStatus(r: KeyModelRow | undefined, today: string = quotaDay()): Shown {
+const STALE_BUSY_MS = 15 * 60 * 1000;
+
+/** When the daily quota next resets (midnight in Pacific time), and how long from now, in plain words. */
+export function resetInfo(now: Date = new Date()): string {
+  const day = quotaDay(now);
+  let t = now.getTime();
+  // step forward until the Pacific date changes (at most 25 h away)
+  for (const step of [3600_000, 60_000]) {
+    while (quotaDay(new Date(t + step)) === day && t - now.getTime() < 26 * 3600_000) t += step;
+  }
+  const next = new Date(t + 60_000);
+  const mins = Math.max(0, Math.round((next.getTime() - now.getTime()) / 60000));
+  const bd = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", hour: "numeric", minute: "2-digit", hour12: true }).format(next);
+  return `in ${Math.floor(mins / 60)} h ${mins % 60} min (${bd} Bangladesh time)`;
+}
+
+export function shownStatus(r: KeyModelRow | undefined, today: string = quotaDay(), now: number = Date.now()): Shown {
   if (!r || r.status === "unknown" || !r.last_seen_at) {
     return { label: "Not used yet", tone: "idle", hint: "No evaluation has used this key with this model yet, so its state is unknown." };
   }
@@ -46,11 +62,14 @@ export function shownStatus(r: KeyModelRow | undefined, today: string = quotaDay
     case "ok":
       return { label: "Working", tone: "good", hint: "The last request on this key and model succeeded." };
     case "busy":
+      if (now - new Date(r.last_seen_at).getTime() > STALE_BUSY_MS) {
+        return { label: "Was busy earlier", tone: "idle", hint: "Google said the model was overloaded when this key last tried, a while ago. The key has not been tried since, so its state now is unknown." };
+      }
       return { label: "Busy", tone: "warn", hint: "Google said the model is overloaded or rate limited. This usually clears within minutes." };
     case "quota":
       return r.day && r.day !== today
         ? { label: "Quota may have reset", tone: "warn", hint: "The daily quota ran out on an earlier day. It resets at midnight Pacific time, so this key probably works again." }
-        : { label: "Daily quota used up", tone: "bad", hint: "The free allowance for this model is used up. It resets at midnight Pacific time (about 1 pm in Bangladesh)." };
+        : { label: "Daily quota used up", tone: "bad", hint: "The free allowance for this model is used up. It resets at midnight Pacific time (2 pm in Bangladesh in winter, 1 pm in summer)." };
     case "key_rejected":
       return { label: "Key rejected", tone: "bad", hint: "Google refused this key (invalid, disabled, or the project has no access)." };
     case "unavailable":

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { btn, Card } from "@/components/ui";
-import { ago, compact, money, quotaDay, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo, type Tone } from "@/lib/apiStatus";
+import { ago, compact, money, quotaDay, resetInfo, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo, type Tone } from "@/lib/apiStatus";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 const TONE: Record<Tone, string> = {
@@ -60,7 +60,7 @@ export default function ApisPage() {
     return [...seen.values()].sort((a, b) => a.slot - b.slot);
   }, [rows]);
   const forModel = (slot: number) => rows.find((r) => r.slot === slot && r.model === model);
-  const summary = slots.map((s) => shownStatus(forModel(s.slot), today));
+  const summary = slots.map((s) => shownStatus(forModel(s.slot), today, now));
   const ready = summary.filter((s) => s.tone === "good").length;
   const cost = info ? typicalCallCost(info) : null;
 
@@ -159,7 +159,7 @@ export default function ApisPage() {
                 <tbody className="divide-y divide-slate-100">
                   {slots.map((s) => {
                     const r = forModel(s.slot);
-                    const st = shownStatus(r, today);
+                    const st = shownStatus(r, today, now);
                     const used = usedToday(r, today);
                     const limit = info?.free_rpd ?? null;
                     const pct = limit ? Math.min(100, (used.requests / limit) * 100) : 0;
@@ -198,7 +198,8 @@ export default function ApisPage() {
             <ul className="mt-4 space-y-1 text-xs text-slate-500">
               <li>Status is learned from real evaluations (&quot;last seen&quot;); nothing is tested in the background, so no quota is spent.</li>
               <li>A request counts as one whatever its size, but the per-minute token limit is separate. Keys from the same Google project share one quota.</li>
-              <li>Daily quotas reset at midnight Pacific time. Counts only include calls made by your worker, so they are an estimate. Today&apos;s quota day: {today}.</li>
+              <li>Daily quotas reset at midnight Pacific time: next reset {resetInfo()}. The counters start again from 0 then. Counts only include calls made by your worker, so they are an estimate.</li>
+              <li>Refresh only reloads what was saved. A key&apos;s status changes only when an evaluation actually uses it.</li>
             </ul>
           </Card>
         </>
