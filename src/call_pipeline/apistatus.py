@@ -71,6 +71,10 @@ class StatusReporter:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._checker: threading.Thread | None = None
+        self._api_keys = tuple(settings.api_keys)
+        self._probe_clients: dict[int, object] = {}
+        self._warned_checks = False
         for slot, env, tail in self.slots:
             for model in self.models:
                 self._rows[(slot, model)] = {
@@ -93,6 +97,13 @@ class StatusReporter:
             log.warning("API status page: could not publish (%s). Run supabase/migrations/003_api_status.sql if you have not.", str(exc)[:160])
         self._thread = threading.Thread(target=self._loop, name="api-status", daemon=True)
         self._thread.start()
+        try:   # old "Check now" requests are of no use any more
+            cutoff = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            self.db.delete("api_check_requests", f"created_at=lt.{cutoff}")
+        except Exception:
+            log.debug("api_check_requests not available yet", exc_info=True)
+        self._checker = threading.Thread(target=self._check_loop, name="api-checks", daemon=True)
+        self._checker.start()
 
     def stop(self) -> None:
         self._stop.set()
@@ -114,6 +125,54 @@ class StatusReporter:
             if old.get("day") == today:
                 row["requests_today"] = old.get("requests_today") or 0
                 row["tokens_today"] = old.get("tokens_today") or 0
+
+    # ---- "Check now" -------------------------------------------------------------------------
+    def probe(self, slot: int, model: str) -> tuple[str, str]:
+        """One tiny real request to this key + model. Counts as one request of the daily quota.
+        Records the outcome like any other call and returns (status, detail)."""
+        from google import genai
+        from google.genai import types
+        from .gemini_client import classify
+
+        if not 1 <= slot <= len(self._api_keys):
+            return "error", f"there is no api{slot} in .env"
+        try:
+            client = self._probe_clients.get(slot)
+            if client is None:   # its own client with a short timeout: a hung check must not hang for 20 minutes
+                client = self._probe_clients[slot] = genai.Client(
+                    api_key=self._api_keys[slot - 1], http_options=types.HttpOptions(timeout=30_000))
+            resp = client.models.generate_content(
+                model=model, contents="Reply with the single word: ok",
+                config=types.GenerateContentConfig(max_output_tokens=16, temperature=0))
+            tokens = getattr(getattr(resp, "usage_metadata", None), "total_token_count", 0) or 0
+            self.event(slot - 1, model, "ok", tokens=int(tokens))
+            return "ok", ""
+        except Exception as exc:
+            kind, _ = classify(exc, 0)
+            status = {"retry": "busy", "quota": "quota", "key": "key_rejected", "model": "unavailable"}.get(kind, "error")
+            detail = str(exc)[:160].strip()
+            self.event(slot - 1, "*" if status == "key_rejected" else model, status, detail)
+            return status, detail
+
+    def _check_loop(self) -> None:
+        while not self._stop.wait(3.0):
+            try:
+                self._run_checks()
+            except Exception as exc:
+                if not self._warned_checks:
+                    self._warned_checks = True
+                    log.warning("API 'Check now' is not working (run supabase/migrations/005_api_checks.sql?): %s", str(exc)[:160])
+
+    def _run_checks(self) -> None:
+        for req in self.db.select("api_check_requests", f"provider=eq.{PROVIDER}&status=eq.pending&order=created_at&limit=10"):
+            if not self.db.patch("api_check_requests", f"id=eq.{req['id']}&status=eq.pending", {"status": "running"}):
+                continue   # another worker took it
+            status, detail = self.probe(int(req["slot"]), req["model"])
+            self.flush()   # publish the new key status before the request is marked done
+            self.db.patch("api_check_requests", f"id=eq.{req['id']}",
+                          {"status": "done", "result": status, "detail": detail or None,
+                           "finished_at": datetime.now(timezone.utc).isoformat()})
+            log.info("API check: api%s %s -> %s", req["slot"], req["model"], status)
 
     # ---- events ------------------------------------------------------------------------------
     def event(self, k: int, model: str, kind: str, detail: str = "", tokens: int = 0) -> None:

@@ -466,7 +466,7 @@ class StubExtractor:
     def __init__(self, behaviour=None):
         self.behaviour, self.calls = behaviour, 0
 
-    def extract(self, rec, instruction, on_progress=None):
+    def extract(self, rec, instruction, on_progress=None, on_status=None, models=None):
         self.calls += 1
         if on_progress:
             on_progress('{"transcript": [{"time": "00:00:07"}')

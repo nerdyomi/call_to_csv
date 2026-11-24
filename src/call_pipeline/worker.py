@@ -83,6 +83,11 @@ class Progress:
             else:
                 self.set("transcribing", 12)
 
+    def on_status(self, kind: str, slot: int, model: str, attempt: int) -> None:
+        """What the worker is doing right now: asking a key/model, or waiting because Google is busy.
+        The website turns 'busy|2|gemini-3.8-flash|2' into readable text."""
+        self.set(f"{kind}|{slot}|{model}|{attempt}", max(self.pct, 8))
+
     def done_patch(self) -> dict:
         return {"stage": None, "progress": 100} if self.enabled else {}
 
@@ -124,7 +129,7 @@ class Worker:
                 prog.set("thinking", 8)
                 pick = (call.get("requested_model") or "").strip()   # model chosen on the website ("" = Auto)
                 extra = {"models": [pick]} if pick else {}
-                res = self._get_extractor().extract(rec, USER_INSTRUCTION, on_progress=prog.on_text, **extra)
+                res = self._get_extractor().extract(rec, USER_INSTRUCTION, on_progress=prog.on_text, on_status=prog.on_status, **extra)
         except QuotaExhausted as exc:
             # not the call's fault: keep it in the queue and wait for the quota to come back
             self.db.update_call(cid, {"status": "queued", "queued_at": _now(), "error": str(exc)[:500],

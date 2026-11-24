@@ -168,6 +168,14 @@ class GeminiExtractor:
         except Exception:
             log.debug("status event failed", exc_info=True)
 
+    @staticmethod
+    def _status(cb, kind: str, k: int, model: str, attempt: int) -> None:
+        if cb:
+            try:
+                cb(kind, k + 1, model, attempt + 1)
+            except Exception:   # a status display must never break an extraction
+                log.debug("status callback failed", exc_info=True)
+
     def _drop(self, kind: str, model: str, k: int, exc: Exception) -> None:
         reason = f"{kind} ({str(exc)[:110].strip()})"
         with self._lock:
@@ -224,9 +232,11 @@ class GeminiExtractor:
                 usage = chunk.usage_metadata
         return SimpleNamespace(text=text, usage_metadata=usage)
 
-    def extract(self, rec: Recording, instruction: str, on_progress=None, models: list[str] | None = None) -> GeminiResult:
+    def extract(self, rec: Recording, instruction: str, on_progress=None, models: list[str] | None = None,
+                on_status=None) -> GeminiResult:
         """`on_progress(text_so_far)`: when given, the answer is streamed and the callback sees the growing JSON text.
-        `models`: use only these models (a model picked on the website) instead of the main model + backups."""
+        `models`: use only these models (a model picked on the website) instead of the main model + backups.
+        `on_status(kind, slot, model, attempt)`: kind is 'trying' (request sent) or 'busy' (Google overloaded, will retry)."""
         uploads: dict[int, object] = {}
         last: Exception | None = None
         try:
@@ -246,6 +256,7 @@ class GeminiExtractor:
                     continue
                 for attempt in range(self.s.max_retries + 1):
                     self.limiters[k].wait()
+                    self._status(on_status, "trying", k, model, attempt)
                     try:
                         resp = self._generate(k, model, part, instruction, on_progress)
                         text = resp.text
@@ -261,6 +272,8 @@ class GeminiExtractor:
                         if kind == "fatal":
                             raise
                         self._emit(k, model, kind, exc)
+                        if kind == "retry":
+                            self._status(on_status, "busy", k, model, attempt)
                         if kind != "retry":
                             self._drop(kind, model, k, exc)
                             break

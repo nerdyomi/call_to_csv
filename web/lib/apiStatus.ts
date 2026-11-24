@@ -108,3 +108,29 @@ export function typicalCallCost(m: ModelInfo, audioSeconds = 300, outputTokens =
   if (m.input_per_m === null || m.audio_per_m === null || m.output_per_m === null) return null;
   return (audioSeconds * 32 * m.audio_per_m + textTokens * m.input_per_m + outputTokens * m.output_per_m) / 1_000_000;
 }
+
+export interface CheckReq {
+  id: string;
+  slot: number;
+  model: string;
+  status: "pending" | "running" | "done";
+  result: string | null;
+  detail: string | null;
+  created_at: string;
+}
+
+const CHECK_OPEN_MS = 3 * 60 * 1000; // a request older than this is treated as lost
+const CHECK_STUCK_MS = 90 * 1000; // not picked up by the worker for this long: tell the user
+
+/** Is a "Check now" for this key + model still waiting for the worker? */
+export function checkPending(checks: CheckReq[], slot: number, model: string, now: number = Date.now()): boolean {
+  return checks.some((c) => c.slot === slot && c.model === model && c.status !== "done" && now - new Date(c.created_at).getTime() < CHECK_OPEN_MS);
+}
+
+/** Checks the worker has not even started after a while (probably not running). */
+export function checkStuck(checks: CheckReq[], now: number = Date.now()): boolean {
+  return checks.some((c) => {
+    const age = now - new Date(c.created_at).getTime();
+    return c.status === "pending" && age > CHECK_STUCK_MS && age < CHECK_OPEN_MS;
+  });
+}

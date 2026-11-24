@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { btn, Card } from "@/components/ui";
-import { ago, compact, money, quotaDay, resetInfo, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo, type Tone } from "@/lib/apiStatus";
+import { ago, checkPending, checkStuck, compact, money, quotaDay, resetInfo, shownStatus, typicalCallCost, usedToday, type CheckReq, type KeyModelRow, type ModelInfo, type Tone } from "@/lib/apiStatus";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 const TONE: Record<Tone, string> = {
@@ -26,16 +26,20 @@ export default function ApisPage() {
   const [provider, setProvider] = useState("gemini");
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [rows, setRows] = useState<KeyModelRow[]>([]);
+  const [checks, setChecks] = useState<CheckReq[]>([]);
+  const [checkErr, setCheckErr] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => Date.now());
 
   const load = useCallback(async () => {
-    const [m, k] = await Promise.all([
+    const [m, k, c] = await Promise.all([
       sb.from("api_models").select("*").eq("provider", "gemini"),
       sb.from("api_key_status").select("*").eq("provider", "gemini").order("slot"),
+      sb.from("api_check_requests").select("*").eq("provider", "gemini").order("created_at", { ascending: false }).limit(60),
     ]);
+    if (!c.error) setChecks((c.data ?? []) as CheckReq[]);
     if (m.error || k.error) setError(m.error?.message ?? k.error?.message ?? null);
     else setError(null);
     const ms = ((m.data ?? []) as ModelInfo[]).sort((a, b) => Number(b.in_chain) - Number(a.in_chain) || a.model.localeCompare(b.model));
@@ -46,11 +50,20 @@ export default function ApisPage() {
     setLoading(false);
   }, [sb]);
 
+  const waiting = checks.some((c) => c.status !== "done" && Date.now() - new Date(c.created_at).getTime() < 3 * 60 * 1000);
   useEffect(() => {
     load();
-    const t = setInterval(load, 15000);
+    const t = setInterval(load, waiting ? 3000 : 15000); // look faster while a check is running
     return () => clearInterval(t);
-  }, [load]);
+  }, [load, waiting]);
+
+  async function checkNow(slotNumbers: number[]) {
+    if (!model) return;
+    setCheckErr(null);
+    const { error } = await sb.from("api_check_requests").insert(slotNumbers.map((slot) => ({ provider: "gemini", slot, model })));
+    if (error) setCheckErr(/does not exist|schema cache|relation/i.test(error.message) ? "Check now needs supabase/migrations/005_api_checks.sql to be run first." : error.message);
+    else load();
+  }
 
   const today = quotaDay();
   const info = models.find((m) => m.model === model);
@@ -149,12 +162,29 @@ export default function ApisPage() {
 
           <Card
             title={`API keys for ${model ?? ""}`}
-            right={slots.length > 0 && <span className="text-sm text-slate-500"><b className="text-emerald-700">{ready}</b> of {slots.length} working right now</span>}
+            right={slots.length > 0 && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-slate-500"><b className="text-emerald-700">{ready}</b> of {slots.length} working right now</span>
+                <button
+                  className={btn.secondary} disabled={slots.some((s) => checkPending(checks, s.slot, model ?? "", now))}
+                  onClick={() => checkNow(slots.map((s) => s.slot))}
+                  title="Sends one tiny request to every key with this model. Each one counts as 1 of the daily requests."
+                >
+                  Check all keys
+                </button>
+              </div>
+            )}
           >
+            {checkErr && <div className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">{checkErr}</div>}
+            {checkStuck(checks, now) && (
+              <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                The worker has not picked up the check yet. Is it running? Start it with <code className="rounded bg-white px-1">python -m call_pipeline worker</code>.
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead className="text-left text-xs uppercase tracking-wide text-slate-500">
-                  <tr><th className="px-3 py-2">Key</th><th className="px-3 py-2">Variable in .env</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">Last seen</th><th className="px-3 py-2">Used today (estimate)</th></tr>
+                  <tr><th className="px-3 py-2">Key</th><th className="px-3 py-2">Variable in .env</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">Last seen</th><th className="px-3 py-2">Used today (estimate)</th><th className="px-3 py-2"></th></tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {slots.map((s) => {
@@ -189,6 +219,11 @@ export default function ApisPage() {
                             </div>
                           ) : null}
                         </td>
+                        <td className="whitespace-nowrap px-3 py-3 text-right">
+                          {checkPending(checks, s.slot, model ?? "", now)
+                            ? <span className="text-xs text-slate-500"><span className="spinner" /> Checking…</span>
+                            : <button className={btn.secondary} onClick={() => checkNow([s.slot])} title="Sends one tiny request to this key with this model (counts as 1 of the daily requests).">Check now</button>}
+                        </td>
                       </tr>
                     );
                   })}
@@ -199,7 +234,7 @@ export default function ApisPage() {
               <li>Status is learned from real evaluations (&quot;last seen&quot;); nothing is tested in the background, so no quota is spent.</li>
               <li>A request counts as one whatever its size, but the per-minute token limit is separate. Keys from the same Google project share one quota.</li>
               <li>Daily quotas reset at midnight Pacific time: next reset {resetInfo()}. The counters start again from 0 then. Counts only include calls made by your worker, so they are an estimate.</li>
-              <li>Refresh only reloads what was saved. A key&apos;s status changes only when an evaluation actually uses it.</li>
+              <li>Refresh only reloads what was saved. A key&apos;s status changes when an evaluation uses it, or when you press <b>Check now</b>, which sends one tiny request to that key and model (it counts as 1 of the daily requests).</li>
             </ul>
           </Card>
         </>

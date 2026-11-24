@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { STAGE_LABEL } from "@/lib/format";
+import { isWaitingStage, stageLabel } from "@/lib/format";
 import type { Call, CallStatus } from "@/lib/types";
 
 const CHIP: Record<CallStatus, string> = {
@@ -47,17 +47,18 @@ export function elapsed(since: string | null | undefined, now: number): string {
 /** Live bar for an evaluating call: real percentage while the transcript is written, striped while the AI thinks. */
 export function CallProgress({ call, now }: { call: Call; now: number }) {
   const pct = Math.max(0, Math.min(100, call.progress ?? 0));
-  const thinking = call.status === "processing" && (call.stage === "thinking" || call.stage === "downloading" || pct <= 10);
+  const thinking = call.status === "processing" && (isWaitingStage(call.stage) || pct <= 10);
+  const busy = (call.stage ?? "").startsWith("busy|");
   const label =
     call.status === "queued"
       ? "Waiting for the analysis worker…"
-      : STAGE_LABEL[call.stage ?? ""] ?? "Evaluating";
+      : stageLabel(call.stage);
   return (
     <div className="min-w-[220px]">
       <div className="mb-1 flex items-center justify-between text-xs">
-        <span className="font-medium text-slate-700">{label}</span>
+        <span className={`font-medium ${busy ? "text-amber-700" : "text-slate-700"}`}>{label}</span>
         <span className="tabular-nums text-slate-500">
-          {call.status === "processing" ? `${pct}%` : ""}
+          {call.status === "processing" && !thinking ? `${pct}%` : ""}
           {call.status === "processing" && call.started_at ? ` · ${elapsed(call.started_at, now)}` : ""}
         </span>
       </div>

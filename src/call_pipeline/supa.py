@@ -56,6 +56,12 @@ class Supa:
                                        headers={"Prefer": "resolution=merge-duplicates,return=minimal"}),
                         f"upsert {table}")
 
+    def patch(self, table: str, query: str, body: dict) -> list[dict]:
+        """Update matching rows and return them (an empty list means nothing matched)."""
+        r = self._check(self.http.patch(f"{self.base}/rest/v1/{table}?{query}", json=body,
+                                        headers={"Prefer": "return=representation"}), f"patch {table}")
+        return r.json()
+
     def delete(self, table: str, query: str) -> None:
         self._check(self.http.delete(f"{self.base}/rest/v1/{table}?{query}", headers={"Prefer": "return=minimal"}),
                     f"delete {table}")

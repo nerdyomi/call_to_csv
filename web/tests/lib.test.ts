@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { isValidDate, normalizePhone, parseRecordingName, safeStorageName, stripAudioExtensions } from "../lib/filename";
-import { hmsToSeconds, callLabel } from "../lib/format";
+import { hmsToSeconds, callLabel, stageLabel, isWaitingStage } from "../lib/format";
 import { aggregate, matches, runTool, searchCalls, type Row } from "../lib/tools";
 import { normalizeBehaviour, parseJson } from "../lib/behaviour";
 import { buildCallContext, estimateTokens } from "../lib/context";
 import { chatOnce, chatStream, stripThink } from "../lib/groq";
 import type { Call, CallResult } from "../lib/types";
-import { ago, resetInfo, quotaDay, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo } from "../lib/apiStatus";
+import { ago, checkPending, checkStuck, resetInfo, quotaDay, shownStatus, typicalCallCost, usedToday, type KeyModelRow, type ModelInfo } from "../lib/apiStatus";
 
 describe("recording file names", () => {
   it("reads phone and date from the CEX naming pattern", () => {
@@ -237,5 +237,35 @@ describe("stale busy and reset time", () => {
   });
   it("tells how long until the Pacific-time reset, with the Bangladesh clock time", () => {
     expect(resetInfo(new Date("2026-11-24T07:46:00Z"))).toBe("in 0 h 14 min (2:00 pm Bangladesh time)");
+  });
+});
+
+describe("progress stage text", () => {
+  it("explains what the worker is waiting for", () => {
+    expect(stageLabel("trying|2|gemini-3.8-flash|1")).toBe("Waiting for gemini-3.8-flash · api2");
+    expect(stageLabel("trying|2|gemini-3.8-flash|2")).toContain("try 2");
+    expect(stageLabel("busy|3|gemini-3.6-flash|2")).toBe("Google is busy · retrying api3 (gemini-3.6-flash, try 2)");
+    expect(stageLabel("transcribing")).toBe("Writing the conversation");
+    expect(stageLabel(null)).toBe("Evaluating");
+  });
+  it("only the waiting stages have no real percentage", () => {
+    expect(isWaitingStage("busy|1|m|1") && isWaitingStage("trying|1|m|1") && isWaitingStage("thinking") && isWaitingStage(null)).toBe(true);
+    expect(isWaitingStage("transcribing") || isWaitingStage("extracting")).toBe(false);
+  });
+});
+
+describe("check now requests", () => {
+  const now = Date.parse("2026-11-24T12:00:00Z");
+  const req = (p: object) => ({ id: "1", slot: 2, model: "m", status: "pending", result: null, detail: null, created_at: "2026-11-24T11:59:30Z", ...p }) as never;
+  it("is pending for that key and model only, until done or lost", () => {
+    expect(checkPending([req({})], 2, "m", now)).toBe(true);
+    expect(checkPending([req({})], 3, "m", now)).toBe(false);
+    expect(checkPending([req({ status: "done" })], 2, "m", now)).toBe(false);
+    expect(checkPending([req({ created_at: "2026-11-24T11:50:00Z" })], 2, "m", now)).toBe(false);
+  });
+  it("warns when the worker has not started a check for over 90 s", () => {
+    expect(checkStuck([req({ created_at: "2026-11-24T11:59:00Z" })], now)).toBe(false);
+    expect(checkStuck([req({ created_at: "2026-11-24T11:58:00Z" })], now)).toBe(true);
+    expect(checkStuck([req({ created_at: "2026-11-24T11:58:00Z", status: "running" })], now)).toBe(false);
   });
 });
